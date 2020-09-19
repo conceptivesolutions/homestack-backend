@@ -8,3 +8,6 @@
 
 # Maven
 target/
+
+# MongoDB
+.docker/mongodb/data
