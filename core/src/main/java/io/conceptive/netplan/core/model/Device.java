@@ -27,6 +27,15 @@ public class Device
   public Set<Metric> metrics;
 
   /**
+   * Checks, if this device could be valid
+   */
+  public void checkValid()
+  {
+    if(id == null || id.isBlank())
+      throw new RuntimeException("id empty");
+  }
+
+  /**
    * POJO for a single metric for a single device
    * Care, this will be used in REST directly
    */
