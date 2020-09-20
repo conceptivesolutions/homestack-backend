@@ -22,6 +22,11 @@ public class Device
   public String address;
 
   /**
+   * Determines, where this device is located
+   */
+  public Location location;
+
+  /**
    * Contains all currently known metrics data of the device
    */
   public Set<Metric> metrics;
@@ -31,7 +36,7 @@ public class Device
    */
   public void checkValid()
   {
-    if(id == null || id.isBlank())
+    if (id == null || id.isBlank())
       throw new RuntimeException("id empty");
   }
 
@@ -96,6 +101,22 @@ public class Device
      * State could not be determined
      */
     UNKNOWN
+  }
+
+  /**
+   * Location of a device
+   */
+  public static class Location
+  {
+    /**
+     * X Position on screen
+     */
+    public float x;
+
+    /**
+     * Y Position on screen
+     */
+    public float y;
   }
 
 }
