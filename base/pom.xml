@@ -18,6 +18,11 @@
       <artifactId>core</artifactId>
       <version>${project.version}</version>
     </dependency>
+    <dependency>
+      <groupId>io.conceptive.netplan.metrics</groupId>
+      <artifactId>ping</artifactId>
+      <version>${project.version}</version>
+    </dependency>
 
     <!-- REST -->
     <dependency>

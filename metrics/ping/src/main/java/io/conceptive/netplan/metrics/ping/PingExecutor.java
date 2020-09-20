@@ -23,7 +23,7 @@ import java.util.stream.Collectors;
 public class PingExecutor implements IMetricsExecutor
 {
 
-  private static final int _COUNT = 10;
+  private static final int _COUNT = 1;
 
   @Override
   public boolean canExecute()
@@ -38,7 +38,6 @@ public class PingExecutor implements IMetricsExecutor
     List<_PingResultObject> results = new ArrayList<>();
     Flowable.create(new _PingFlowable(pDevice), BackpressureStrategy.LATEST)
         .limit(_COUNT)
-        .doOnNext(System.out::println)
         .blockingForEach(results::add);
     return new _PingResult(results);
   }
