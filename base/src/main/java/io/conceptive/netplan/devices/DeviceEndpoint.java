@@ -42,15 +42,41 @@ public class DeviceEndpoint
   }
 
   /**
-   * Create or Update a device in the repository
+   * Create a device in the repository
    *
-   * @param pID     ID of the device to insert / update
+   * @param pID     ID of the device to insert
    * @param pDevice Device
    */
   @PUT
   @Path("/{id}")
   @Produces(MediaType.APPLICATION_JSON)
   public Response put(@PathParam("id") String pID, @Nullable Device pDevice)
+  {
+    if(pID == null || pID.isBlank() || pDevice == null)
+      return Response.status(Response.Status.BAD_REQUEST).build();
+
+    // Do not allow inserting metrics
+    if(pDevice.metrics != null)
+      return Response.status(Response.Status.BAD_REQUEST.getStatusCode(), "Metrics can not be updated").build();
+
+    // force ID to be set and "correct"
+    pDevice.id = pID;
+
+    // insert
+    deviceRepository.insertDevice(pDevice);
+    return Response.ok(pDevice).build();
+  }
+
+  /**
+   * Update a device in the repository
+   *
+   * @param pID     ID of the device to update
+   * @param pDevice Device
+   */
+  @PATCH
+  @Path("/{id}")
+  @Produces(MediaType.APPLICATION_JSON)
+  public Response patch(@PathParam("id") String pID, @Nullable Device pDevice)
   {
     if(pID == null || pID.isBlank() || pDevice == null)
       return Response.status(Response.Status.BAD_REQUEST).build();
@@ -63,7 +89,7 @@ public class DeviceEndpoint
     pDevice.id = pID;
 
     // Update
-    deviceRepository.updateOrInsertDevice(pDevice);
+    deviceRepository.updateDevice(pDevice);
     return Response.ok(pDevice).build();
   }
 
