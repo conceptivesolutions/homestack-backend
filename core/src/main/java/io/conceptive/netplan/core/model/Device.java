@@ -32,6 +32,11 @@ public class Device
   public Set<Metric> metrics;
 
   /**
+   * Contains all "neighbour" edges
+   */
+  public Set<Edge> edges;
+
+  /**
    * Checks, if this device could be valid
    */
   public void checkValid()
@@ -117,6 +122,17 @@ public class Device
      * Y Position on screen
      */
     public float y;
+  }
+
+  /**
+   * Simple relation to another device
+   */
+  public static class Edge
+  {
+    /**
+     * ID of the target device
+     */
+    public String deviceID;
   }
 
 }
