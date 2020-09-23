@@ -21,6 +21,19 @@ public class DeviceEndpoint
   protected IDeviceRepository deviceRepository;
 
   /**
+   * Returns all available devices
+   *
+   * @return the devices
+   */
+  @GET
+  @Path("/")
+  @Produces(MediaType.APPLICATION_JSON)
+  public Response get()
+  {
+    return Response.ok(deviceRepository.findAll()).build();
+  }
+
+  /**
    * Searches a device with the given id
    *
    * @param pID ID to search for
