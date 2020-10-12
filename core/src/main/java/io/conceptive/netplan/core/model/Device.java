@@ -1,7 +1,5 @@
 package io.conceptive.netplan.core.model;
 
-import org.jetbrains.annotations.NotNull;
-
 import java.util.*;
 
 /**
@@ -32,43 +30,6 @@ public class Device
    * Contains all currently known metrics data of the device
    */
   public Set<Metric> metrics;
-
-  /**
-   * Contains all "neighbour" edges
-   */
-  public Set<Edge> edges;
-
-  /**
-   * Updates this device with all values set in pOther
-   *
-   * @param pOther Other Device that contains all properties that should be modified
-   * @return true, if something has changed
-   */
-  public boolean updateWith(@NotNull Device pOther)
-  {
-    boolean changed = false;
-
-    if(pOther.address != null)
-    {
-      address = pOther.address;
-      changed = true;
-    }
-
-    if(pOther.location != null)
-    {
-      location = pOther.location;
-      changed = true;
-    }
-
-    if(pOther.edges != null)
-    {
-      if(edges == null)
-        edges = new HashSet<>();
-      changed = edges.addAll(pOther.edges);
-    }
-
-    return changed;
-  }
   
   /**
    * Checks, if this device could be valid
@@ -156,17 +117,6 @@ public class Device
      * Y Position on screen
      */
     public float y;
-  }
-
-  /**
-   * Simple relation to another device
-   */
-  public static class Edge
-  {
-    /**
-     * ID of the target device
-     */
-    public String deviceID;
   }
 
 }

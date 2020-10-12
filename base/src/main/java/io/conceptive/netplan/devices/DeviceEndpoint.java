@@ -44,11 +44,11 @@ public class DeviceEndpoint
   @Produces(MediaType.APPLICATION_JSON)
   public Response get(@PathParam("id") String pID)
   {
-    if(pID == null || pID.isBlank())
+    if (pID == null || pID.isBlank())
       return Response.status(Response.Status.BAD_REQUEST).build();
 
     Device device = deviceRepository.findDeviceById(pID);
-    if(device == null)
+    if (device == null)
       return Response.status(Response.Status.NOT_FOUND).build();
 
     return Response.ok(device).build();
@@ -65,11 +65,11 @@ public class DeviceEndpoint
   @Produces(MediaType.APPLICATION_JSON)
   public Response put(@PathParam("id") String pID, @Nullable Device pDevice)
   {
-    if(pID == null || pID.isBlank() || pDevice == null)
+    if (pID == null || pID.isBlank() || pDevice == null)
       return Response.status(Response.Status.BAD_REQUEST).build();
 
     // Do not allow inserting metrics
-    if(pDevice.metrics != null)
+    if (pDevice.metrics != null)
       return Response.status(Response.Status.BAD_REQUEST.getStatusCode(), "Metrics can not be updated").build();
 
     // force ID to be set and "correct"
@@ -91,14 +91,27 @@ public class DeviceEndpoint
   @Produces(MediaType.APPLICATION_JSON)
   public Response patch(@PathParam("id") String pID, @Nullable Device pDevice)
   {
-    if(pID == null || pID.isBlank() || pDevice == null)
+    if (pID == null || pID.isBlank() || pDevice == null)
       return Response.status(Response.Status.BAD_REQUEST).build();
 
     Device device = deviceRepository.findDeviceById(pID);
-    if(device == null)
+    if (device == null)
       return Response.status(Response.Status.NOT_FOUND).build();
 
-    if(!device.updateWith(pDevice))
+    boolean changed = false;
+    if (pDevice.address != null)
+    {
+      device.address = pDevice.address;
+      changed = true;
+    }
+
+    if (pDevice.location != null)
+    {
+      device.location = pDevice.location;
+      changed = true;
+    }
+
+    if (!changed)
       return Response.status(Response.Status.NOT_MODIFIED).build();
 
     // Update
@@ -116,11 +129,11 @@ public class DeviceEndpoint
   @Produces(MediaType.APPLICATION_JSON)
   public Response delete(@PathParam("id") String pID)
   {
-    if(pID == null || pID.isBlank())
+    if (pID == null || pID.isBlank())
       return Response.status(Response.Status.BAD_REQUEST).build();
 
     boolean deleted = deviceRepository.deleteDeviceByID(pID);
-    if(deleted)
+    if (deleted)
       return Response.ok().build();
 
     return Response.notModified().build();
