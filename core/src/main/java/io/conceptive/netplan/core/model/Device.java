@@ -1,7 +1,5 @@
 package io.conceptive.netplan.core.model;
 
-import java.util.*;
-
 /**
  * POJO for a single device.
  * Care, this will be used in REST directly
@@ -25,11 +23,6 @@ public class Device
    * Determines, where this device is located
    */
   public Location location;
-
-  /**
-   * Contains all currently known metrics data of the device
-   */
-  public Set<Metric> metrics;
   
   /**
    * Checks, if this device could be valid
@@ -38,69 +31,6 @@ public class Device
   {
     if (id == null || id.isBlank())
       throw new RuntimeException("id empty");
-  }
-
-  /**
-   * POJO for a single metric for a single device
-   * Care, this will be used in REST directly
-   */
-  public static class Metric
-  {
-    /**
-     * Time when this metric was recorded
-     */
-    public Date recordTime;
-
-    /**
-     * Type of this metric (PING, TRACERT, etc.)
-     */
-    public String type;
-
-    /**
-     * State of this metric
-     */
-    public EMetricState state;
-
-    /**
-     * Description, why the state is failed, warned, etc.
-     */
-    public String stateDescription;
-
-    /**
-     * Command which was executed to determine its state
-     */
-    public String executedCommand;
-
-    /**
-     * Plain result of the executed command
-     */
-    public String commandResult;
-  }
-
-  /**
-   * State to determine, what to expect from a device
-   */
-  public enum EMetricState
-  {
-    /**
-     * Device FAILED, so it can not be used anywhere
-     */
-    FAILURE,
-
-    /**
-     * Device can be used, but may not work correctly
-     */
-    WARNING,
-
-    /**
-     * Device is OK and ready to use
-     */
-    SUCCESS,
-
-    /**
-     * State could not be determined
-     */
-    UNKNOWN
   }
 
   /**

@@ -1,12 +1,12 @@
 package io.conceptive.netplan.metrics;
 
 import com.google.common.util.concurrent.ThreadFactoryBuilder;
-import io.conceptive.netplan.core.model.Device;
+import io.conceptive.netplan.core.model.*;
 import io.conceptive.netplan.metrics.api.*;
-import io.conceptive.netplan.repository.IDeviceRepository;
+import io.conceptive.netplan.repository.*;
 import io.quarkus.runtime.Startup;
-import io.reactivex.*;
 import io.reactivex.Observable;
+import io.reactivex.*;
 import io.reactivex.disposables.Disposable;
 import io.reactivex.schedulers.Schedulers;
 import org.jboss.logging.Logger;
@@ -33,6 +33,9 @@ public class MetricsUpdaterService
   protected IDeviceRepository deviceRepository;
 
   @Inject
+  protected IMetricsRepository metricsRepository;
+
+  @Inject
   protected Instance<IMetricsExecutor> metricsExecutors;
 
   @SuppressWarnings({"FieldCanBeLocal", "unused", "RedundantSuppression"})
@@ -49,7 +52,7 @@ public class MetricsUpdaterService
     return Flowable.interval(5, TimeUnit.SECONDS)
 
         // Only execute if it is correctly initialized
-        .filter(pL -> deviceRepository != null)
+        .filter(pL -> deviceRepository != null && metricsRepository != null)
 
         // Backpressure
         .onBackpressureDrop()
@@ -106,7 +109,7 @@ public class MetricsUpdaterService
           .map(Optional::get)
 
           // Update
-          .blockingForEach(pMetric -> deviceRepository.updateMetric(pDevice, _toMetric(pMetric)));
+          .blockingForEach(pMetric -> metricsRepository.updateMetric(_toMetric(pDevice, pMetric)));
     }
     catch(Throwable ex)
     {
@@ -117,16 +120,18 @@ public class MetricsUpdaterService
   /**
    * Converts a metricsResult to the serializable metric object
    *
+   * @param pDevice Device which the metric belongs to
    * @param pResult result to convert
    * @return converted result
    */
   @NotNull
-  private Device.Metric _toMetric(@NotNull IMetricsResult pResult)
+  private Metric _toMetric(@NotNull Device pDevice, @NotNull IMetricsResult pResult)
   {
-    Device.Metric metric = new Device.Metric();
+    Metric metric = new Metric();
+    metric.deviceID = pDevice.id;
     metric.recordTime = new Date();
     metric.type = "UNKOWN";
-    metric.state = Device.EMetricState.valueOf(pResult.getState().name());
+    metric.state = Metric.EMetricState.valueOf(pResult.getState().name());
     metric.stateDescription = pResult.getStateDescription();
     metric.executedCommand = pResult.getExecutedCommand();
     metric.commandResult = pResult.getCommandResult();

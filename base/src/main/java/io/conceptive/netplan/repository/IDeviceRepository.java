@@ -43,14 +43,6 @@ public interface IDeviceRepository
   void updateDevice(@NotNull Device pDevice);
 
   /**
-   * Updates the metric of a single device
-   *
-   * @param pDevice Device to update
-   * @param pMetric Metric to add / update
-   */
-  void updateMetric(@NotNull Device pDevice, @NotNull Device.Metric pMetric);
-
-  /**
    * Deletes the device (if any) specified by given id
    *
    * @param pID ID of the device to be deleted

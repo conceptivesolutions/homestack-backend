@@ -68,10 +68,6 @@ public class DeviceEndpoint
     if (pID == null || pID.isBlank() || pDevice == null)
       return Response.status(Response.Status.BAD_REQUEST).build();
 
-    // Do not allow inserting metrics
-    if (pDevice.metrics != null)
-      return Response.status(Response.Status.BAD_REQUEST.getStatusCode(), "Metrics can not be updated").build();
-
     // force ID to be set and "correct"
     pDevice.id = pID;
 
