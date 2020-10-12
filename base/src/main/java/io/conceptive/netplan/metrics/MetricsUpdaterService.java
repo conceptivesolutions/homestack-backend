@@ -60,10 +60,20 @@ public class MetricsUpdaterService
                                                                      .build())))
 
         // Map to all devices
-        .map(pTime -> deviceRepository.findAll())
+        .map(pTime -> {
+          try
+          {
+            return deviceRepository.findAll();
+          }
+          catch(Throwable e)
+          {
+            _LOGGER.error("Failed to update device metric state", e);
+            return Set.<Device>of();
+          }
+        })
 
         // Subscribe and check
-        .subscribe(pDevices -> pDevices.forEach(this::_updateDeviceBlocking), pError -> _LOGGER.error("Failed to update device metric state", pError));
+        .subscribe(pDevices -> pDevices.forEach(this::_updateDeviceBlocking));
   }
 
   /**
