@@ -1,5 +1,7 @@
 package io.conceptive.netplan.core.model;
 
+import org.jetbrains.annotations.NotNull;
+
 import java.util.*;
 
 /**
@@ -36,6 +38,38 @@ public class Device
    */
   public Set<Edge> edges;
 
+  /**
+   * Updates this device with all values set in pOther
+   *
+   * @param pOther Other Device that contains all properties that should be modified
+   * @return true, if something has changed
+   */
+  public boolean updateWith(@NotNull Device pOther)
+  {
+    boolean changed = false;
+
+    if(pOther.address != null)
+    {
+      address = pOther.address;
+      changed = true;
+    }
+
+    if(pOther.location != null)
+    {
+      location = pOther.location;
+      changed = true;
+    }
+
+    if(pOther.edges != null)
+    {
+      if(edges == null)
+        edges = new HashSet<>();
+      changed = edges.addAll(pOther.edges);
+    }
+
+    return changed;
+  }
+  
   /**
    * Checks, if this device could be valid
    */

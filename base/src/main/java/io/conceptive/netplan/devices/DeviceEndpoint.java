@@ -94,15 +94,15 @@ public class DeviceEndpoint
     if(pID == null || pID.isBlank() || pDevice == null)
       return Response.status(Response.Status.BAD_REQUEST).build();
 
-    // Do not allow updating metrics
-    if(pDevice.metrics != null)
-      return Response.status(Response.Status.BAD_REQUEST.getStatusCode(), "Metrics can not be updated").build();
+    Device device = deviceRepository.findDeviceById(pID);
+    if(device == null)
+      return Response.status(Response.Status.NOT_FOUND).build();
 
-    // force ID to be set and "correct"
-    pDevice.id = pID;
+    if(!device.updateWith(pDevice))
+      return Response.status(Response.Status.NOT_MODIFIED).build();
 
     // Update
-    deviceRepository.updateDevice(pDevice);
+    deviceRepository.updateDevice(device);
     return Response.ok(pDevice).build();
   }
 
