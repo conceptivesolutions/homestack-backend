@@ -32,8 +32,8 @@ public class EdgeRepositoryImpl implements IEdgeRepository
   @Override
   public boolean addEdge(@NotNull String pSourceID, @NotNull String pTargetID)
   {
-    Bson filter1 = Filters.or(Filters.eq("sourceID", pSourceID), Filters.eq("targetID", pTargetID));
-    Bson filter2 = Filters.or(Filters.eq("sourceID", pTargetID), Filters.eq("targetID", pSourceID));
+    Bson filter1 = Filters.and(Filters.eq("sourceID", pSourceID), Filters.eq("targetID", pTargetID));
+    Bson filter2 = Filters.and(Filters.eq("sourceID", pTargetID), Filters.eq("targetID", pSourceID));
 
     // Only insert if it does not exist - no duplicate
     if (_getCollection().find(Filters.or(filter1, filter2)).first() == null)
@@ -52,8 +52,8 @@ public class EdgeRepositoryImpl implements IEdgeRepository
   @Override
   public boolean removeEdge(@NotNull String pSourceID, @NotNull String pTargetID)
   {
-    Bson filter1 = Filters.or(Filters.eq("sourceID", pSourceID), Filters.eq("targetID", pTargetID));
-    Bson filter2 = Filters.or(Filters.eq("sourceID", pTargetID), Filters.eq("targetID", pSourceID));
+    Bson filter1 = Filters.and(Filters.eq("sourceID", pSourceID), Filters.eq("targetID", pTargetID));
+    Bson filter2 = Filters.and(Filters.eq("sourceID", pTargetID), Filters.eq("targetID", pSourceID));
     return _getCollection().deleteMany(Filters.or(filter1, filter2)).getDeletedCount() > 0;
   }
 
