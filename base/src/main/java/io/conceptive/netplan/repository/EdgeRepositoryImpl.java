@@ -10,7 +10,7 @@ import org.jetbrains.annotations.NotNull;
 
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
-import java.util.Set;
+import java.util.*;
 
 /**
  * @author w.glanzer, 12.10.2020
@@ -39,6 +39,7 @@ public class EdgeRepositoryImpl implements IEdgeRepository
     if (_getCollection().find(Filters.or(filter1, filter2)).first() == null)
     {
       Edge edge = new Edge();
+      edge.id = UUID.randomUUID().toString();
       edge.sourceID = pSourceID;
       edge.targetID = pTargetID;
       _getCollection().insertOne(edge);

@@ -8,6 +8,11 @@ package io.conceptive.netplan.core.model;
 public class Edge
 {
   /**
+   * ID of the edge
+   */
+  public String id;
+
+  /**
    * ID of the source device
    */
   public String sourceID;
