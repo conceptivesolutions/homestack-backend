@@ -10,6 +10,7 @@ import org.junit.*;
  * @see PingExecutor
  * @author w.glanzer, 18.09.2020
  */
+@Ignore
 public class Test_PingExecutor
 {
 
