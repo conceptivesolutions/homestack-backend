@@ -1,9 +1,11 @@
 package io.conceptive.netplan.devices;
 
+import io.conceptive.netplan.core.IRole;
 import io.conceptive.netplan.core.model.Device;
 import io.conceptive.netplan.repository.IDeviceRepository;
 import org.jetbrains.annotations.Nullable;
 
+import javax.annotation.security.RolesAllowed;
 import javax.inject.Inject;
 import javax.ws.rs.*;
 import javax.ws.rs.core.*;
@@ -13,6 +15,7 @@ import javax.ws.rs.core.*;
  *
  * @author w.glanzer, 13.09.2020
  */
+@RolesAllowed(IRole.DEFAULT)
 @Path("/devices")
 public class DeviceEndpoint
 {

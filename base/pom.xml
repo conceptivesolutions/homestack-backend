@@ -30,6 +30,12 @@
       <artifactId>quarkus-resteasy-jsonb</artifactId>
     </dependency>
 
+    <!-- OpenID Connect -->
+    <dependency>
+      <groupId>io.quarkus</groupId>
+      <artifactId>quarkus-oidc</artifactId>
+    </dependency>
+
     <!-- MongoDB Client -->
     <dependency>
       <groupId>io.quarkus</groupId>
