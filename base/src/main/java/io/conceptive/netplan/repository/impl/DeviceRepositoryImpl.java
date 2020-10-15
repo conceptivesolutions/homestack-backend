@@ -1,4 +1,4 @@
-package io.conceptive.netplan.repository;
+package io.conceptive.netplan.repository.impl;
 
 import com.google.common.collect.Sets;
 import com.mongodb.BasicDBObject;
@@ -6,6 +6,7 @@ import com.mongodb.client.*;
 import com.mongodb.client.model.*;
 import io.conceptive.netplan.IDBConstants;
 import io.conceptive.netplan.core.model.Device;
+import io.conceptive.netplan.repository.IDeviceRepository;
 import org.jetbrains.annotations.*;
 
 import javax.enterprise.context.ApplicationScoped;

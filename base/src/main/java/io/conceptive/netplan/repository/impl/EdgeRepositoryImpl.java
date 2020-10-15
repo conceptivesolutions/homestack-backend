@@ -1,10 +1,11 @@
-package io.conceptive.netplan.repository;
+package io.conceptive.netplan.repository.impl;
 
 import com.google.common.collect.Sets;
 import com.mongodb.client.*;
 import com.mongodb.client.model.Filters;
 import io.conceptive.netplan.IDBConstants;
 import io.conceptive.netplan.core.model.Edge;
+import io.conceptive.netplan.repository.IEdgeRepository;
 import org.bson.conversions.Bson;
 import org.jetbrains.annotations.NotNull;
 
