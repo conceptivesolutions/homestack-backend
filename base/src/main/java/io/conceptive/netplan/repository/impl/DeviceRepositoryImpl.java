@@ -22,9 +22,11 @@ public class DeviceRepositoryImpl extends AbstractRepository<Device> implements 
 
   @NotNull
   @Override
-  public synchronized Set<Device> findAll()
+  public synchronized Set<Device> findAll(@Nullable String pHostID)
   {
-    return Sets.newHashSet(getCollection().find());
+    if (pHostID == null || pHostID.isBlank())
+      return Sets.newHashSet(getCollection().find());
+    return Sets.newHashSet(getCollection().find(Filters.eq("hostID", pHostID)));
   }
 
   @Nullable

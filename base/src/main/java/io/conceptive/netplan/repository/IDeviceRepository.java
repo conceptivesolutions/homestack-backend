@@ -14,10 +14,11 @@ public interface IDeviceRepository
   /**
    * Returns all currently known devices
    *
+   * @param pHostID ID of the host, NULL for wildcarding all hosts
    * @return all devices
    */
   @NotNull
-  Set<Device> findAll();
+  Set<Device> findAll(@Nullable String pHostID);
 
   /**
    * Tries to find the device by the given id

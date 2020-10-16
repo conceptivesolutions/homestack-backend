@@ -35,7 +35,20 @@ public class DeviceEndpoint
   @Produces(MediaType.APPLICATION_JSON)
   public Set<Device> get()
   {
-    return deviceRepository.findAll();
+    return deviceRepository.findAll(null);
+  }
+
+  /**
+   * Returns all available devices
+   *
+   * @return the devices
+   */
+  @GET
+  @Path("/")
+  @Produces(MediaType.APPLICATION_JSON)
+  public Set<Device> get(@QueryParam("host") @Nullable String pHostID)
+  {
+    return deviceRepository.findAll(pHostID);
   }
 
   /**
@@ -73,6 +86,9 @@ public class DeviceEndpoint
     if (pID == null || pID.isBlank() || pDevice == null)
       throw new BadRequestException();
 
+    if (pDevice.hostID == null || pDevice.hostID.isBlank())
+      throw new BadRequestException("hostID has to be specified");
+
     // force ID to be set and "correct"
     pDevice.id = pID;
 
@@ -102,6 +118,7 @@ public class DeviceEndpoint
     // Update Data
     device.address = ObjectUtils.firstNonNull(pDevice.address, device.address);
     device.location = ObjectUtils.firstNonNull(pDevice.location, device.location);
+    device.hostID = ObjectUtils.firstNonNull(pDevice.hostID, device.hostID);
     deviceRepository.updateDevice(device);
     return device;
   }
