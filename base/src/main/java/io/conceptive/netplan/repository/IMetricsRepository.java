@@ -21,10 +21,17 @@ public interface IMetricsRepository
   Set<Metric> findAll(@NotNull String pDeviceID);
 
   /**
-   * Updates the metric of a single device
-   *
-   * @param pMetric Metric to add / update
+   * Contains all methods for tokenless access to the metrics repository
    */
-  void updateMetric(@NotNull Metric pMetric);
+  interface ITokenlessRepository
+  {
+    /**
+     * Updates the metric of a single device
+     *
+     * @param pUserID ID of the user
+     * @param pMetric Metric to add / update
+     */
+    void updateMetric(@NotNull String pUserID, @NotNull Metric pMetric);
+  }
 
 }

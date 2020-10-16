@@ -9,6 +9,7 @@ import io.reactivex.Observable;
 import io.reactivex.*;
 import io.reactivex.disposables.Disposable;
 import io.reactivex.schedulers.Schedulers;
+import org.apache.commons.lang3.tuple.Pair;
 import org.jboss.logging.Logger;
 import org.jetbrains.annotations.NotNull;
 
@@ -30,10 +31,13 @@ public class MetricsUpdaterService
   private static final Logger _LOGGER = Logger.getLogger(MetricsUpdaterService.class.getName());
 
   @Inject
+  protected IUserRepository userRepository;
+
+  @Inject
   protected IDeviceRepository.ITokenlessRepository deviceRepository;
 
   @Inject
-  protected IMetricsRepository metricsRepository;
+  protected IMetricsRepository.ITokenlessRepository metricsRepository;
 
   @Inject
   protected Instance<IMetricsExecutor> metricsExecutors;
@@ -62,45 +66,53 @@ public class MetricsUpdaterService
                                                                      .setNameFormat("tMetricsUpdater-%d")
                                                                      .build())))
 
-        // Map to all devices
+        // Map to all users
         .map(pTime -> {
           try
           {
-            return deviceRepository.getAllDevices();
+            return userRepository.findAll();
           }
-          catch(Throwable e)
+          catch (Throwable e)
           {
             _LOGGER.error("Failed to update device metric state", e);
-            return Set.<Device>of();
+            return Set.<String>of();
           }
         })
 
         // Subscribe and check
-        .subscribe(pDevices -> pDevices.forEach(this::_updateDeviceBlocking));
+        .subscribe(pUser -> pUser.forEach(this::_updateUserBlocking));
   }
 
   /**
-   * Updates a given device - blocks the current thread
+   * Updates all devices for the given user - blocks the current thread
    *
-   * @param pDevice device to update
+   * @param pUserID ID of the user to update
    */
-  private void _updateDeviceBlocking(@NotNull Device pDevice)
+  private void _updateUserBlocking(@NotNull String pUserID)
   {
     try
     {
-      // Analyze Metrics
-      Observable.fromIterable(metricsExecutors)
+      // Retrieve devices
+      Observable.fromIterable(deviceRepository.findAll(pUserID))
 
-          // Execute all executors in parallel
-          .map(pExecutor -> {
+          // Combine with executor
+          .flatMap(pDevice -> Observable.fromIterable(metricsExecutors)
+              .map(pExecutor -> Pair.of(pDevice, pExecutor)))
+
+          // Execute all device/executor pairs in parallel
+          .map(pExecInfo -> {
+            Device device = pExecInfo.getLeft();
+            IMetricsExecutor executor = pExecInfo.getRight();
+
             try
             {
-              return Optional.of(pExecutor.execute(pDevice));
+              IMetricsResult result = executor.execute(device);
+              return Optional.of(Pair.of(device, result));
             }
-            catch(Throwable ex)
+            catch (Throwable ex)
             {
-              _LOGGER.error("Failed to execute metric " + pExecutor + " for device with id " + pDevice.id, ex);
-              return Optional.<IMetricsResult>empty();
+              _LOGGER.error("Failed to execute metric " + executor + " for device with id " + device.id, ex);
+              return Optional.<Pair<Device, IMetricsResult>>empty();
             }
           })
 
@@ -109,11 +121,11 @@ public class MetricsUpdaterService
           .map(Optional::get)
 
           // Update
-          .blockingForEach(pMetric -> metricsRepository.updateMetric(_toMetric(pDevice, pMetric)));
+          .blockingForEach(pDeviceMetricsPair -> metricsRepository.updateMetric(pUserID, _toMetric(pDeviceMetricsPair.getLeft(), pDeviceMetricsPair.getRight())));
     }
-    catch(Throwable ex)
+    catch (Throwable ex)
     {
-      _LOGGER.error("Failed to update device with ID: " + pDevice.id, ex);
+      _LOGGER.error("Failed to update devices for user " + pUserID, ex);
     }
   }
 

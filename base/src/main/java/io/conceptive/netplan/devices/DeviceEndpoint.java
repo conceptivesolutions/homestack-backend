@@ -33,22 +33,11 @@ public class DeviceEndpoint
   @GET
   @Path("/")
   @Produces(MediaType.APPLICATION_JSON)
-  public Set<Device> get()
-  {
-    return deviceRepository.findAll(null);
-  }
-
-  /**
-   * Returns all available devices
-   *
-   * @return the devices
-   */
-  @GET
-  @Path("/")
-  @Produces(MediaType.APPLICATION_JSON)
   public Set<Device> get(@QueryParam("host") @Nullable String pHostID)
   {
-    return deviceRepository.findAll(pHostID);
+    if (pHostID == null || pHostID.isBlank())
+      return deviceRepository.findAll();
+    return deviceRepository.findByHost(pHostID);
   }
 
   /**

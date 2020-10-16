@@ -9,7 +9,6 @@ import org.jetbrains.annotations.*;
 
 import javax.enterprise.context.Dependent;
 import java.util.Set;
-import java.util.stream.*;
 
 /**
  * IDeviceRepository-Impl
@@ -22,10 +21,15 @@ public class DeviceRepositoryImpl extends AbstractRepository<Device> implements 
 
   @NotNull
   @Override
-  public synchronized Set<Device> findAll(@Nullable String pHostID)
+  public Set<Device> findAll()
   {
-    if (pHostID == null || pHostID.isBlank())
-      return Sets.newHashSet(getCollection().find());
+    return Sets.newHashSet(getCollection().find());
+  }
+
+  @NotNull
+  @Override
+  public synchronized Set<Device> findByHost(@NotNull String pHostID)
+  {
     return Sets.newHashSet(getCollection().find(Filters.eq("hostID", pHostID)));
   }
 
@@ -58,11 +62,9 @@ public class DeviceRepositoryImpl extends AbstractRepository<Device> implements 
 
   @NotNull
   @Override
-  public Set<Device> getAllDevices()
+  public Set<Device> findAll(@NotNull String pUserID)
   {
-    return getCollections().parallelStream()
-        .flatMap(pCollection -> StreamSupport.stream(pCollection.find().spliterator(), false))
-        .collect(Collectors.toSet());
+    return Sets.newHashSet(getCollectionForUser(pUserID).find());
   }
 
   @NotNull

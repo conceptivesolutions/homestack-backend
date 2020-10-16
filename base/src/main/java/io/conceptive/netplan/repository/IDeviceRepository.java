@@ -14,11 +14,19 @@ public interface IDeviceRepository
   /**
    * Returns all currently known devices
    *
-   * @param pHostID ID of the host, NULL for wildcarding all hosts
    * @return all devices
    */
   @NotNull
-  Set<Device> findAll(@Nullable String pHostID);
+  Set<Device> findAll();
+
+  /**
+   * Returns all currently known devices for a given host
+   *
+   * @param pHostID ID of the host
+   * @return all devices
+   */
+  @NotNull
+  Set<Device> findByHost(@NotNull String pHostID);
 
   /**
    * Tries to find the device by the given id
@@ -57,12 +65,13 @@ public interface IDeviceRepository
   interface ITokenlessRepository
   {
     /**
-     * Returns all currently known devices in the whole database
+     * Returns all currently known devices in the database of a single user
      *
+     * @param pUserID ID of the user
      * @return all devices
      */
     @NotNull
-    Set<Device> getAllDevices();
+    Set<Device> findAll(@NotNull String pUserID);
   }
 
 }

@@ -13,7 +13,7 @@ import java.util.Set;
  * @author w.glanzer, 12.10.2020
  */
 @Dependent
-public class MetricsRepositoryImpl extends AbstractRepository<Metric> implements IMetricsRepository
+public class MetricsRepositoryImpl extends AbstractRepository<Metric> implements IMetricsRepository, IMetricsRepository.ITokenlessRepository
 {
 
   @NotNull
@@ -24,9 +24,9 @@ public class MetricsRepositoryImpl extends AbstractRepository<Metric> implements
   }
 
   @Override
-  public void updateMetric(@NotNull Metric pMetric)
+  public void updateMetric(@NotNull String pUserID, @NotNull Metric pMetric)
   {
-    getCollection().replaceOne(Filters.and(Filters.eq("deviceID", pMetric.deviceID), Filters.eq("type", pMetric.type)), pMetric, UPSERT);
+    getCollectionForUser(pUserID).replaceOne(Filters.and(Filters.eq("deviceID", pMetric.deviceID), Filters.eq("type", pMetric.type)), pMetric, UPSERT);
   }
 
   @NotNull
