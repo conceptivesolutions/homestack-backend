@@ -9,6 +9,7 @@ import org.jetbrains.annotations.*;
 
 import javax.enterprise.context.Dependent;
 import java.util.Set;
+import java.util.stream.*;
 
 /**
  * IDeviceRepository-Impl
@@ -16,7 +17,7 @@ import java.util.Set;
  * @author w.glanzer, 13.09.2020
  */
 @Dependent
-public class DeviceRepositoryImpl extends AbstractRepository<Device> implements IDeviceRepository
+public class DeviceRepositoryImpl extends AbstractRepository<Device> implements IDeviceRepository, IDeviceRepository.ITokenlessRepository
 {
 
   @NotNull
@@ -55,9 +56,17 @@ public class DeviceRepositoryImpl extends AbstractRepository<Device> implements 
 
   @NotNull
   @Override
+  public Set<Device> getAllDevices()
+  {
+    return getCollections().parallelStream()
+        .flatMap(pCollection -> StreamSupport.stream(pCollection.find().spliterator(), false))
+        .collect(Collectors.toSet());
+  }
+
+  @NotNull
+  @Override
   protected Class<Device> getCollectionType()
   {
     return Device.class;
   }
-
 }

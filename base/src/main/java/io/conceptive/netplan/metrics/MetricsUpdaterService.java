@@ -30,7 +30,7 @@ public class MetricsUpdaterService
   private static final Logger _LOGGER = Logger.getLogger(MetricsUpdaterService.class.getName());
 
   @Inject
-  protected IDeviceRepository deviceRepository;
+  protected IDeviceRepository.ITokenlessRepository deviceRepository;
 
   @Inject
   protected IMetricsRepository metricsRepository;
@@ -66,7 +66,7 @@ public class MetricsUpdaterService
         .map(pTime -> {
           try
           {
-            return deviceRepository.findAll();
+            return deviceRepository.getAllDevices();
           }
           catch(Throwable e)
           {

@@ -50,4 +50,18 @@ public interface IDeviceRepository
    */
   boolean deleteDeviceByID(@NotNull String pID);
 
+  /**
+   * Contains all methods for tokenless access to the device repository
+   */
+  interface ITokenlessRepository
+  {
+    /**
+     * Returns all currently known devices in the whole database
+     *
+     * @return all devices
+     */
+    @NotNull
+    Set<Device> getAllDevices();
+  }
+
 }
