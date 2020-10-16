@@ -2,15 +2,12 @@ package io.conceptive.netplan.repository.impl;
 
 import com.google.common.collect.Sets;
 import com.mongodb.BasicDBObject;
-import com.mongodb.client.*;
-import com.mongodb.client.model.*;
-import io.conceptive.netplan.IDBConstants;
+import com.mongodb.client.model.Filters;
 import io.conceptive.netplan.core.model.Device;
 import io.conceptive.netplan.repository.IDeviceRepository;
 import org.jetbrains.annotations.*;
 
-import javax.enterprise.context.ApplicationScoped;
-import javax.inject.Inject;
+import javax.enterprise.context.Dependent;
 import java.util.Set;
 
 /**
@@ -18,58 +15,49 @@ import java.util.Set;
  *
  * @author w.glanzer, 13.09.2020
  */
-@ApplicationScoped
-public class DeviceRepositoryImpl implements IDeviceRepository
+@Dependent
+public class DeviceRepositoryImpl extends AbstractRepository<Device> implements IDeviceRepository
 {
-
-  private static final ReplaceOptions _UPSERT = new ReplaceOptions().upsert(true);
-
-  @Inject
-  protected MongoClient mongoClient;
 
   @NotNull
   @Override
   public synchronized Set<Device> findAll()
   {
-    return Sets.newHashSet(_getCollection().find());
+    return Sets.newHashSet(getCollection().find());
   }
 
   @Nullable
   @Override
   public synchronized Device findDeviceById(@NotNull String pID)
   {
-    return _getCollection().find(Filters.eq("_id", pID), Device.class).first();
+    return getCollection().find(Filters.eq("_id", pID), Device.class).first();
   }
 
   @Override
   public synchronized void insertDevice(@NotNull Device pDevice)
   {
     pDevice.checkValid();
-    _getCollection().insertOne(pDevice);
+    getCollection().insertOne(pDevice);
   }
 
   @Override
   public synchronized void updateDevice(@NotNull Device pDevice)
   {
     pDevice.checkValid();
-    _getCollection().replaceOne(Filters.eq("_id", pDevice.id), pDevice, _UPSERT);
+    getCollection().replaceOne(Filters.eq("_id", pDevice.id), pDevice, UPSERT);
   }
 
   @Override
   public synchronized boolean deleteDeviceByID(@NotNull String pID)
   {
-    return _getCollection().deleteOne(new BasicDBObject("_id", pID)).getDeletedCount() > 0;
+    return getCollection().deleteOne(new BasicDBObject("_id", pID)).getDeletedCount() > 0;
   }
 
-  /**
-   * @return the collection to use for this repository
-   */
   @NotNull
-  private MongoCollection<Device> _getCollection()
+  @Override
+  protected Class<Device> getCollectionType()
   {
-    return mongoClient
-        .getDatabase(IDBConstants.DB_NAME)
-        .getCollection("devices", Device.class);
+    return Device.class;
   }
 
 }

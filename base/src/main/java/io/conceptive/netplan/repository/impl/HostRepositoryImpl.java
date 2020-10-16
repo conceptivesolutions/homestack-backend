@@ -1,67 +1,58 @@
 package io.conceptive.netplan.repository.impl;
 
 import com.google.common.collect.Sets;
-import com.mongodb.client.*;
-import com.mongodb.client.model.*;
-import io.conceptive.netplan.IDBConstants;
+import com.mongodb.client.model.Filters;
 import io.conceptive.netplan.core.model.Host;
 import io.conceptive.netplan.repository.IHostRepository;
 import org.jetbrains.annotations.*;
 
-import javax.inject.Inject;
+import javax.enterprise.context.Dependent;
 import java.util.Set;
 
 /**
  * @author w.glanzer, 16.10.2020
  */
-public class HostRepositoryImpl implements IHostRepository
+@Dependent
+public class HostRepositoryImpl extends AbstractRepository<Host> implements IHostRepository
 {
-
-  private static final ReplaceOptions _UPSERT = new ReplaceOptions().upsert(true);
-
-  @Inject
-  protected MongoClient mongoClient;
 
   @NotNull
   @Override
   public Set<Host> findAll()
   {
-    return Sets.newHashSet(_getCollection().find());
+    return Sets.newHashSet(getCollection().find());
   }
 
   @Nullable
   @Override
   public Host findHostByID(@NotNull String pHostID)
   {
-    return _getCollection().find(Filters.eq("_id", pHostID), Host.class).first();
+    return getCollection().find(Filters.eq("_id", pHostID), Host.class).first();
   }
 
   @Override
   public void insertHost(@NotNull Host pHost)
   {
-    _getCollection().insertOne(pHost);
+    getCollection().insertOne(pHost);
   }
 
   @Override
   public void updateHost(@NotNull Host pHost)
   {
-    _getCollection().replaceOne(Filters.eq("_id", pHost.id), pHost, _UPSERT);
+    getCollection().replaceOne(Filters.eq("_id", pHost.id), pHost, UPSERT);
   }
 
   @Override
   public boolean deleteHost(@NotNull String pHostID)
   {
-    return _getCollection().deleteOne(Filters.eq("_id", pHostID)).getDeletedCount() > 0;
+    return getCollection().deleteOne(Filters.eq("_id", pHostID)).getDeletedCount() > 0;
   }
 
-  /**
-   * @return the collection to use for this repository
-   */
   @NotNull
-  private MongoCollection<Host> _getCollection()
+  @Override
+  protected Class<Host> getCollectionType()
   {
-    return mongoClient
-        .getDatabase(IDBConstants.DB_NAME)
-        .getCollection("hosts", Host.class);
+    return Host.class;
   }
+
 }
