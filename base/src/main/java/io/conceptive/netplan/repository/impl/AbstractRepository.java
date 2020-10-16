@@ -59,7 +59,7 @@ abstract class AbstractRepository<T>
     Class<T> type = getCollectionType();
     return StreamSupport.stream(mongoClient.listDatabaseNames().spliterator(), false)
         .map(pDBName -> mongoClient.getDatabase(pDBName))
-        .map(pDB -> pDB.getCollection(type.getName().toLowerCase(), type))
+        .map(pDB -> pDB.getCollection(type.getSimpleName().toLowerCase(), type))
         .collect(Collectors.toSet());
   }
 
@@ -73,7 +73,7 @@ abstract class AbstractRepository<T>
     Class<T> type = getCollectionType();
     return mongoClient
         .getDatabase(pUserID)
-        .getCollection(type.getName().toLowerCase(), type);
+        .getCollection(type.getSimpleName().toLowerCase(), type);
   }
 
 }
