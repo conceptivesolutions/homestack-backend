@@ -15,6 +15,11 @@ public class Device
   public String id;
 
   /**
+   * ID of the host this device belongs to
+   */
+  public String hostID;
+
+  /**
    * Address (IP or Hostname) of the device
    */
   public String address;
