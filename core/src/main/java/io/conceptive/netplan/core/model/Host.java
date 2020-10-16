@@ -15,11 +15,6 @@ public class Host
   public String id;
 
   /**
-   * ID of the user this host belongs to
-   */
-  public String userID;
-
-  /**
    * Displayable String
    */
   public String displayName;
