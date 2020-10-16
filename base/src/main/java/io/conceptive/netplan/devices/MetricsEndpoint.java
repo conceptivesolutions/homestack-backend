@@ -1,13 +1,15 @@
 package io.conceptive.netplan.devices;
 
 import io.conceptive.netplan.core.IRole;
+import io.conceptive.netplan.core.model.Metric;
 import io.conceptive.netplan.repository.IMetricsRepository;
 import org.jetbrains.annotations.Nullable;
 
 import javax.annotation.security.RolesAllowed;
 import javax.inject.Inject;
 import javax.ws.rs.*;
-import javax.ws.rs.core.*;
+import javax.ws.rs.core.MediaType;
+import java.util.Set;
 
 /**
  * @author w.glanzer, 12.10.2020
@@ -28,11 +30,12 @@ public class MetricsEndpoint
   @GET
   @Path("/")
   @Produces(MediaType.APPLICATION_JSON)
-  public Response get(@Nullable @PathParam("deviceID") String pDeviceID)
+  public Set<Metric> get(@Nullable @PathParam("deviceID") String pDeviceID)
   {
     if (pDeviceID == null || pDeviceID.isBlank())
-      return Response.status(Response.Status.BAD_REQUEST).build();
-    return Response.ok(metricsRepository.findAll(pDeviceID)).build();
+      throw new BadRequestException();
+
+    return metricsRepository.findAll(pDeviceID);
   }
 
 }

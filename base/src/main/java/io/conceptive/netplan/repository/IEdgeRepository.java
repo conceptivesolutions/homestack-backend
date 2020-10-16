@@ -25,9 +25,10 @@ public interface IEdgeRepository
    *
    * @param pSourceID ID of the source device
    * @param pTargetID ID of the target device
-   * @return true, if edge was added - false, if it already existed
+   * @return Edge that was added
    */
-  boolean addEdge(@NotNull String pSourceID, @NotNull String pTargetID);
+  @NotNull
+  Edge addEdge(@NotNull String pSourceID, @NotNull String pTargetID);
 
   /**
    * Removes the edge between pSourceID and pTargetID

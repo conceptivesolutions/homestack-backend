@@ -30,24 +30,26 @@ public class EdgeRepositoryImpl implements IEdgeRepository
     return Sets.newHashSet(_getCollection().find(Filters.or(Filters.eq("sourceID", pDeviceID), Filters.eq("targetID", pDeviceID)), Edge.class));
   }
 
+  @NotNull
   @Override
-  public boolean addEdge(@NotNull String pSourceID, @NotNull String pTargetID)
+  public Edge addEdge(@NotNull String pSourceID, @NotNull String pTargetID)
   {
     Bson filter1 = Filters.and(Filters.eq("sourceID", pSourceID), Filters.eq("targetID", pTargetID));
     Bson filter2 = Filters.and(Filters.eq("sourceID", pTargetID), Filters.eq("targetID", pSourceID));
 
+    Edge edge = _getCollection().find(Filters.or(filter1, filter2)).first();
+
     // Only insert if it does not exist - no duplicate
-    if (_getCollection().find(Filters.or(filter1, filter2)).first() == null)
+    if (edge == null)
     {
-      Edge edge = new Edge();
+      edge = new Edge();
       edge.id = UUID.randomUUID().toString();
       edge.sourceID = pSourceID;
       edge.targetID = pTargetID;
       _getCollection().insertOne(edge);
-      return true;
     }
 
-    return false;
+    return edge;
   }
 
   @Override

@@ -1,13 +1,15 @@
 package io.conceptive.netplan.devices;
 
 import io.conceptive.netplan.core.IRole;
+import io.conceptive.netplan.core.model.Edge;
 import io.conceptive.netplan.repository.IEdgeRepository;
 import org.jetbrains.annotations.Nullable;
 
 import javax.annotation.security.RolesAllowed;
 import javax.inject.Inject;
 import javax.ws.rs.*;
-import javax.ws.rs.core.*;
+import javax.ws.rs.core.MediaType;
+import java.util.Set;
 
 /**
  * @author w.glanzer, 12.10.2020
@@ -28,11 +30,12 @@ public class EdgesEndpoint
   @GET
   @Path("/")
   @Produces(MediaType.APPLICATION_JSON)
-  public Response get(@Nullable @PathParam("deviceID") String pDeviceID)
+  public Set<Edge> get(@Nullable @PathParam("deviceID") String pDeviceID)
   {
     if (pDeviceID == null || pDeviceID.isBlank())
-      return Response.status(Response.Status.BAD_REQUEST).build();
-    return Response.ok(edgeRepository.findAll(pDeviceID)).build();
+      throw new BadRequestException();
+
+    return edgeRepository.findAll(pDeviceID);
   }
 
   /**
@@ -44,15 +47,12 @@ public class EdgesEndpoint
   @POST
   @Path("/")
   @Produces(MediaType.APPLICATION_JSON)
-  public Response put(@Nullable @PathParam("deviceID") String pDeviceID, @Nullable String pTargetDeviceID)
+  public Edge put(@Nullable @PathParam("deviceID") String pDeviceID, @Nullable String pTargetDeviceID)
   {
     if (pDeviceID == null || pDeviceID.isBlank() || pTargetDeviceID == null || pTargetDeviceID.isBlank())
-      return Response.status(Response.Status.BAD_REQUEST).build();
+      throw new BadRequestException();
 
-    if (edgeRepository.addEdge(pDeviceID, pTargetDeviceID))
-      return Response.ok().build();
-
-    return Response.notModified().build();
+    return edgeRepository.addEdge(pDeviceID, pTargetDeviceID);
   }
 
   /**
@@ -64,14 +64,12 @@ public class EdgesEndpoint
   @DELETE
   @Path("/{targetID}")
   @Produces(MediaType.APPLICATION_JSON)
-  public Response delete(@Nullable @PathParam("deviceID") String pDeviceID, @Nullable @PathParam("targetID") String pTargetID)
+  public void delete(@Nullable @PathParam("deviceID") String pDeviceID, @Nullable @PathParam("targetID") String pTargetID)
   {
     if (pDeviceID == null || pDeviceID.isBlank() || pTargetID == null || pTargetID.isBlank())
-      return Response.status(Response.Status.BAD_REQUEST).build();
+      throw new BadRequestException();
 
-    if (edgeRepository.removeEdge(pDeviceID, pTargetID))
-      return Response.ok().build();
-
-    return Response.notModified().build();
+    if (!edgeRepository.removeEdge(pDeviceID, pTargetID))
+      throw new NotFoundException();
   }
 }
