@@ -4,7 +4,7 @@ import com.google.common.util.concurrent.ThreadFactoryBuilder;
 import io.conceptive.netplan.core.model.*;
 import io.conceptive.netplan.metrics.api.*;
 import io.conceptive.netplan.repository.*;
-import io.quarkus.runtime.Startup;
+import io.quarkus.runtime.*;
 import io.reactivex.Observable;
 import io.reactivex.*;
 import io.reactivex.disposables.Disposable;
@@ -14,6 +14,7 @@ import org.jboss.logging.Logger;
 import org.jetbrains.annotations.NotNull;
 
 import javax.enterprise.context.ApplicationScoped;
+import javax.enterprise.event.Observes;
 import javax.enterprise.inject.Instance;
 import javax.inject.Inject;
 import java.util.*;
@@ -42,12 +43,27 @@ public class MetricRecordService
   @Inject
   protected Instance<IMetricExecutor> metricExecutors;
 
-  @SuppressWarnings({"FieldCanBeLocal", "unused", "RedundantSuppression"})
-  private final Disposable updaterDisposable;
+  private Disposable updaterDisposable;
 
-  public MetricRecordService()
+  @SuppressWarnings("unused")
+    // Reflection
+  void onStart(@Observes StartupEvent pStartupEvent)
   {
+    if (updaterDisposable != null)
+      updaterDisposable.dispose();
     updaterDisposable = _startUpdater();
+    Logger.getLogger(getClass()).info("Started Device Updater");
+  }
+
+  @SuppressWarnings("unused")
+    // Reflection
+  void onStop(@Observes ShutdownEvent pShutdownEvent)
+  {
+    if (updaterDisposable != null)
+    {
+      updaterDisposable.dispose();
+      Logger.getLogger(getClass()).info("Disposed Device Updater");
+    }
   }
 
   @NotNull
