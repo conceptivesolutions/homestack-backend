@@ -2,6 +2,8 @@ package io.conceptive.netplan.metrics.api;
 
 import org.jetbrains.annotations.*;
 
+import java.util.Map;
+
 /**
  * Specifies the result for a metrics analyzer
  *
@@ -25,27 +27,9 @@ public interface IMetricRecord
   EState getState();
 
   /**
-   * @return description, why the state is offline / unavailable / etc.
+   * @return additional description to the current state
    */
   @Nullable
-  String getStateDescription();
-
-  /**
-   * @return the command that was executed by this metrics analyzer
-   */
-  @Nullable
-  default String getExecutedCommand()
-  {
-    return null;
-  }
-
-  /**
-   * @return the command result, if a command was executed
-   */
-  @Nullable
-  default String getCommandResult()
-  {
-    return null;
-  }
+  Map<String, String> getResult();
 
 }

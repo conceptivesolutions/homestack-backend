@@ -1,6 +1,6 @@
 package io.conceptive.netplan.core.model;
 
-import java.util.Date;
+import java.util.*;
 
 /**
  * POJO for a single metric record for a single device
@@ -31,23 +31,14 @@ public class MetricRecord
   public EState state;
 
   /**
-   * Description, why the state is failed, warned, etc.
+   * Additional properties to the current state
    */
-  public String stateDescription;
-
-  /**
-   * Command which was executed to determine its state
-   */
-  public String executedCommand;
-
-  /**
-   * Plain result of the executed command
-   */
-  public String commandResult;
+  public Map<String, String> result;
 
   /**
    * State to determine, what to expect from a device
    */
+  @SuppressWarnings("unused") // valueOf()
   public enum EState
   {
     /**

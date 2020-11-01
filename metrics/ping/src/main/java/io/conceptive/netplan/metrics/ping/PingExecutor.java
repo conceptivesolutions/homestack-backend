@@ -12,7 +12,6 @@ import javax.enterprise.context.ApplicationScoped;
 import java.net.*;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
-import java.util.stream.Collectors;
 
 /**
  * Executes a "ping" / ICMP request to the given device
@@ -156,14 +155,17 @@ public class PingExecutor implements IMetricExecutor
   private static class _PingResult implements IMetricRecord
   {
     private final EState state;
-    private final String stateDescription;
+    private final Map<String, String> result;
 
     public _PingResult(@NotNull List<_PingResultObject> pResults)
     {
       state = _getState(pResults);
-      stateDescription = pResults.stream()
-          .map(_PingResultObject::toString)
-          .collect(Collectors.joining("\n"));
+      result = Map.of(
+          "responseTime", String.format(Locale.ENGLISH, "%.3f", pResults.stream()
+              .mapToDouble(pObj -> pObj.responseTime)
+              .average()
+              .orElse(0))
+      );
     }
 
     @NotNull
@@ -175,18 +177,9 @@ public class PingExecutor implements IMetricExecutor
 
     @Nullable
     @Override
-    public String getStateDescription()
+    public Map<String, String> getResult()
     {
-      return stateDescription;
-    }
-
-    @Override
-    public String toString()
-    {
-      return "_PingResult{" +
-          ", state=" + state +
-          ", stateDescription='" + stateDescription + '\'' +
-          '}';
+      return result;
     }
 
     /**

@@ -161,9 +161,7 @@ public class MetricRecordService
     metricRecord.recordTime = new Date();
     metricRecord.type = pExecutor.getType();
     metricRecord.state = MetricRecord.EState.valueOf(pResult.getState().name());
-    metricRecord.stateDescription = pResult.getStateDescription();
-    metricRecord.executedCommand = pResult.getExecutedCommand();
-    metricRecord.commandResult = pResult.getCommandResult();
+    metricRecord.result = pResult.getResult();
     return metricRecord;
   }
 }
