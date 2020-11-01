@@ -20,7 +20,7 @@ import java.util.stream.Collectors;
  * @author w.glanzer, 18.09.2020
  */
 @ApplicationScoped
-public class PingExecutor implements IMetricsExecutor
+public class PingExecutor implements IMetricExecutor
 {
 
   private static final int _COUNT = 1;
@@ -33,7 +33,7 @@ public class PingExecutor implements IMetricsExecutor
 
   @NotNull
   @Override
-  public IMetricsResult execute(@NotNull Device pDevice)
+  public IMetricRecord execute(@NotNull Device pDevice)
   {
     List<_PingResultObject> results = new ArrayList<>();
     Flowable.create(new _PingFlowable(pDevice), BackpressureStrategy.LATEST)
@@ -146,7 +146,7 @@ public class PingExecutor implements IMetricsExecutor
   /**
    * Result-Impl
    */
-  private static class _PingResult implements IMetricsResult
+  private static class _PingResult implements IMetricRecord
   {
     private final EState state;
     private final String stateDescription;

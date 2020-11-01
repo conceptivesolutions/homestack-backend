@@ -26,9 +26,9 @@ import java.util.concurrent.*;
  */
 @Startup
 @ApplicationScoped
-public class MetricsUpdaterService
+public class MetricRecordService
 {
-  private static final Logger _LOGGER = Logger.getLogger(MetricsUpdaterService.class.getName());
+  private static final Logger _LOGGER = Logger.getLogger(MetricRecordService.class.getName());
 
   @Inject
   protected IUserRepository userRepository;
@@ -37,15 +37,15 @@ public class MetricsUpdaterService
   protected IDeviceRepository.ITokenlessRepository deviceRepository;
 
   @Inject
-  protected IMetricsRepository.ITokenlessRepository metricsRepository;
+  protected IMetricRecordRepository.ITokenlessRepository metricRepository;
 
   @Inject
-  protected Instance<IMetricsExecutor> metricsExecutors;
+  protected Instance<IMetricExecutor> metricExecutors;
 
   @SuppressWarnings({"FieldCanBeLocal", "unused", "RedundantSuppression"})
   private final Disposable updaterDisposable;
 
-  public MetricsUpdaterService()
+  public MetricRecordService()
   {
     updaterDisposable = _startUpdater();
   }
@@ -56,14 +56,14 @@ public class MetricsUpdaterService
     return Flowable.interval(5, TimeUnit.SECONDS)
 
         // Only execute if it is correctly initialized
-        .filter(pL -> deviceRepository != null && metricsRepository != null)
+        .filter(pL -> deviceRepository != null && metricRepository != null)
 
         // Backpressure
         .onBackpressureDrop()
 
         // Observe on different thread pool
         .observeOn(Schedulers.from(Executors.newCachedThreadPool(new ThreadFactoryBuilder()
-                                                                     .setNameFormat("tMetricsUpdater-%d")
+                                                                     .setNameFormat("tMetricUpdater-%d")
                                                                      .build())))
 
         // Map to all users
@@ -74,7 +74,7 @@ public class MetricsUpdaterService
           }
           catch (Throwable e)
           {
-            _LOGGER.error("Failed to update device metric state", e);
+            _LOGGER.error("Failed to update device metric record", e);
             return Set.<String>of();
           }
         })
@@ -96,23 +96,23 @@ public class MetricsUpdaterService
       Observable.fromIterable(deviceRepository.findAll(pUserID))
 
           // Combine with executor
-          .flatMap(pDevice -> Observable.fromIterable(metricsExecutors)
+          .flatMap(pDevice -> Observable.fromIterable(metricExecutors)
               .map(pExecutor -> Pair.of(pDevice, pExecutor)))
 
           // Execute all device/executor pairs in parallel
           .map(pExecInfo -> {
             Device device = pExecInfo.getLeft();
-            IMetricsExecutor executor = pExecInfo.getRight();
+            IMetricExecutor executor = pExecInfo.getRight();
 
             try
             {
-              IMetricsResult result = executor.execute(device);
+              IMetricRecord result = executor.execute(device);
               return Optional.of(Pair.of(device, result));
             }
             catch (Throwable ex)
             {
               _LOGGER.error("Failed to execute metric " + executor + " for device with id " + device.id, ex);
-              return Optional.<Pair<Device, IMetricsResult>>empty();
+              return Optional.<Pair<Device, IMetricRecord>>empty();
             }
           })
 
@@ -130,23 +130,23 @@ public class MetricsUpdaterService
   }
 
   /**
-   * Converts a metricsResult to the serializable metric object
+   * Converts a metricsResult to the serializable metric result object
    *
    * @param pDevice Device which the metric belongs to
    * @param pResult result to convert
    * @return converted result
    */
   @NotNull
-  private Metric _toMetric(@NotNull Device pDevice, @NotNull IMetricsResult pResult)
+  private MetricRecord _toMetricRecord(@NotNull Device pDevice, @NotNull IMetricRecord pResult)
   {
-    Metric metric = new Metric();
-    metric.deviceID = pDevice.id;
-    metric.recordTime = new Date();
-    metric.type = "UNKOWN";
-    metric.state = Metric.EMetricState.valueOf(pResult.getState().name());
-    metric.stateDescription = pResult.getStateDescription();
-    metric.executedCommand = pResult.getExecutedCommand();
-    metric.commandResult = pResult.getCommandResult();
-    return metric;
+    MetricRecord metricRecord = new MetricRecord();
+    metricRecord.deviceID = pDevice.id;
+    metricRecord.recordTime = new Date();
+    metricRecord.type = "UNKOWN";
+    metricRecord.state = MetricRecord.EState.valueOf(pResult.getState().name());
+    metricRecord.stateDescription = pResult.getStateDescription();
+    metricRecord.executedCommand = pResult.getExecutedCommand();
+    metricRecord.commandResult = pResult.getCommandResult();
+    return metricRecord;
   }
 }

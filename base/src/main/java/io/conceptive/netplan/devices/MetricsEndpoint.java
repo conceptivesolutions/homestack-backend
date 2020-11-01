@@ -1,8 +1,8 @@
 package io.conceptive.netplan.devices;
 
 import io.conceptive.netplan.core.IRole;
-import io.conceptive.netplan.core.model.Metric;
-import io.conceptive.netplan.repository.IMetricsRepository;
+import io.conceptive.netplan.core.model.MetricRecord;
+import io.conceptive.netplan.repository.IMetricRecordRepository;
 import org.jetbrains.annotations.Nullable;
 
 import javax.annotation.security.RolesAllowed;
@@ -20,7 +20,7 @@ public class MetricsEndpoint
 {
 
   @Inject
-  protected IMetricsRepository metricsRepository;
+  protected IMetricRecordRepository metricsRepository;
 
   /**
    * Returns all metrics for a single device
@@ -30,7 +30,7 @@ public class MetricsEndpoint
   @GET
   @Path("/")
   @Produces(MediaType.APPLICATION_JSON)
-  public Set<Metric> get(@Nullable @PathParam("deviceID") String pDeviceID)
+  public Set<MetricRecord> get(@Nullable @PathParam("deviceID") String pDeviceID)
   {
     if (pDeviceID == null || pDeviceID.isBlank())
       throw new BadRequestException();

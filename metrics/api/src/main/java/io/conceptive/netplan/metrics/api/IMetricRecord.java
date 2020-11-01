@@ -7,7 +7,7 @@ import org.jetbrains.annotations.*;
  *
  * @author w.glanzer, 18.09.2020
  */
-public interface IMetricsResult
+public interface IMetricRecord
 {
 
   enum EState

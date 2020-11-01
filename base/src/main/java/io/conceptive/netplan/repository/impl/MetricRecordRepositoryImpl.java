@@ -13,12 +13,12 @@ import java.util.Set;
  * @author w.glanzer, 12.10.2020
  */
 @Dependent
-public class MetricsRepositoryImpl extends AbstractRepository<Metric> implements IMetricsRepository, IMetricsRepository.ITokenlessRepository
+public class MetricRecordRepositoryImpl extends AbstractRepository<MetricRecord> implements IMetricRecordRepository, IMetricRecordRepository.ITokenlessRepository
 {
 
   @NotNull
   @Override
-  public Set<Metric> findAll(@NotNull String pDeviceID)
+  public Set<MetricRecord> findAll(@NotNull String pDeviceID)
   {
     return Sets.newHashSet(getCollection().find(Filters.eq("deviceID", pDeviceID)));
   }
@@ -31,9 +31,9 @@ public class MetricsRepositoryImpl extends AbstractRepository<Metric> implements
 
   @NotNull
   @Override
-  protected Class<Metric> getCollectionType()
+  protected Class<MetricRecord> getCollectionType()
   {
-    return Metric.class;
+    return MetricRecord.class;
   }
 
 }

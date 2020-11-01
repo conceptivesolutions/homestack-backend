@@ -8,7 +8,7 @@ import org.jetbrains.annotations.NotNull;
  *
  * @author w.glanzer, 18.09.2020
  */
-public interface IMetricsExecutor
+public interface IMetricExecutor
 {
 
   /**
@@ -25,6 +25,6 @@ public interface IMetricsExecutor
    * @return the result, not null
    */
   @NotNull
-  IMetricsResult execute(@NotNull Device pDevice);
+  IMetricRecord execute(@NotNull Device pDevice);
 
 }

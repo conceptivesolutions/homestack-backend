@@ -14,7 +14,7 @@ import org.junit.*;
 public class Test_PingExecutor
 {
 
-  private IMetricsExecutor executor;
+  private IMetricExecutor executor;
   private Device device;
 
   @Before
@@ -30,7 +30,7 @@ public class Test_PingExecutor
   public void test_execute()
   {
     Assert.assertTrue(executor.canExecute());
-    IMetricsResult result = executor.execute(device);
+    IMetricRecord result = executor.execute(device);
     Assert.assertNotNull(result);
     Assert.assertNotNull(result.getState());
   }

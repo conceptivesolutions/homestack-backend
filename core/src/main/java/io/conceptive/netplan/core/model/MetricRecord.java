@@ -3,12 +3,12 @@ package io.conceptive.netplan.core.model;
 import java.util.Date;
 
 /**
- * POJO for a single metric for a single device
+ * POJO for a single metric record for a single device
  * Care, this will be used in REST directly
  *
  * @author w.glanzer, 12.10.2020
  */
-public class Metric
+public class MetricRecord
 {
   /**
    * ID of the device this metric belongs to
@@ -28,7 +28,7 @@ public class Metric
   /**
    * State of this metric
    */
-  public EMetricState state;
+  public EState state;
 
   /**
    * Description, why the state is failed, warned, etc.
@@ -48,7 +48,7 @@ public class Metric
   /**
    * State to determine, what to expect from a device
    */
-  public enum EMetricState
+  public enum EState
   {
     /**
      * Device FAILED, so it can not be used anywhere
