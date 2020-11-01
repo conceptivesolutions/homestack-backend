@@ -12,6 +12,16 @@ public interface IMetricExecutor
 {
 
   /**
+   * Returns an unique identifier for this metric.
+   * Something like "ping", "tracert", etc.
+   * Should be lowercased by convention.
+   *
+   * @return the identifier
+   */
+  @NotNull
+  String getType();
+
+  /**
    * Determines, if this executor is generally available, or unavailable for any reason
    *
    * @return true, if available

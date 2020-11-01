@@ -25,6 +25,13 @@ public class PingExecutor implements IMetricExecutor
 
   private static final int _COUNT = 1;
 
+  @NotNull
+  @Override
+  public String getType()
+  {
+    return "ping";
+  }
+
   @Override
   public boolean canExecute()
   {

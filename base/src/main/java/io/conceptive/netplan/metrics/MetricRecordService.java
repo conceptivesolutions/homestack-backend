@@ -107,12 +107,12 @@ public class MetricRecordService
             try
             {
               IMetricRecord result = executor.execute(device);
-              return Optional.of(Pair.of(device, result));
+              return Optional.of(_toMetricRecord(device, executor, result));
             }
             catch (Throwable ex)
             {
               _LOGGER.error("Failed to execute metric " + executor + " for device with id " + device.id, ex);
-              return Optional.<Pair<Device, IMetricRecord>>empty();
+              return Optional.<MetricRecord>empty();
             }
           })
 
@@ -121,7 +121,7 @@ public class MetricRecordService
           .map(Optional::get)
 
           // Insert new metric
-          .blockingForEach(pDeviceMetricsPair -> metricRepository.addMetricRecord(pUserID, _toMetricRecord(pDeviceMetricsPair.getLeft(), pDeviceMetricsPair.getRight())));
+          .blockingForEach(pRecord -> metricRepository.addMetricRecord(pUserID, pRecord));
     }
     catch (Throwable ex)
     {
@@ -132,17 +132,18 @@ public class MetricRecordService
   /**
    * Converts a metricsResult to the serializable metric result object
    *
-   * @param pDevice Device which the metric belongs to
-   * @param pResult result to convert
+   * @param pDevice   Device which the metric belongs to
+   * @param pExecutor the executor that issued the given record
+   * @param pResult   result to convert
    * @return converted result
    */
   @NotNull
-  private MetricRecord _toMetricRecord(@NotNull Device pDevice, @NotNull IMetricRecord pResult)
+  private MetricRecord _toMetricRecord(@NotNull Device pDevice, @NotNull IMetricExecutor pExecutor, @NotNull IMetricRecord pResult)
   {
     MetricRecord metricRecord = new MetricRecord();
     metricRecord.deviceID = pDevice.id;
     metricRecord.recordTime = new Date();
-    metricRecord.type = "UNKOWN";
+    metricRecord.type = pExecutor.getType();
     metricRecord.state = MetricRecord.EState.valueOf(pResult.getState().name());
     metricRecord.stateDescription = pResult.getStateDescription();
     metricRecord.executedCommand = pResult.getExecutedCommand();
