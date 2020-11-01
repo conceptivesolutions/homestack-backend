@@ -120,8 +120,8 @@ public class MetricRecordService
           .filter(Optional::isPresent)
           .map(Optional::get)
 
-          // Update
-          .blockingForEach(pDeviceMetricsPair -> metricsRepository.updateMetric(pUserID, _toMetric(pDeviceMetricsPair.getLeft(), pDeviceMetricsPair.getRight())));
+          // Insert new metric
+          .blockingForEach(pDeviceMetricsPair -> metricRepository.addMetricRecord(pUserID, _toMetricRecord(pDeviceMetricsPair.getLeft(), pDeviceMetricsPair.getRight())));
     }
     catch (Throwable ex)
     {

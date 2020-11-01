@@ -26,12 +26,12 @@ public interface IMetricRecordRepository
   interface ITokenlessRepository
   {
     /**
-     * Updates the metric of a single device
+     * Adds a new metric record to the database
      *
-     * @param pUserID ID of the user
-     * @param pMetric Metric to add / update
+     * @param pUserID       ID of the user, that owns the device of the metric record
+     * @param pMetricRecord Record to insert
      */
-    void updateMetric(@NotNull String pUserID, @NotNull Metric pMetric);
+    void addMetricRecord(@NotNull String pUserID, @NotNull MetricRecord pMetricRecord);
   }
 
 }

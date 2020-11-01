@@ -51,6 +51,15 @@ abstract class AbstractRepository<T>
   }
 
   /**
+   * @return the name of the collection
+   */
+  @NotNull
+  protected String getCollectionName()
+  {
+    return getCollectionType().getSimpleName().toLowerCase();
+  }
+
+  /**
    * @return all known collections for all users
    */
   @NotNull
@@ -59,7 +68,7 @@ abstract class AbstractRepository<T>
     Class<T> type = getCollectionType();
     return StreamSupport.stream(mongoClient.listDatabaseNames().spliterator(), false)
         .map(pDBName -> mongoClient.getDatabase(pDBName))
-        .map(pDB -> pDB.getCollection(type.getSimpleName().toLowerCase(), type))
+        .map(pDB -> pDB.getCollection(getCollectionName(), type))
         .collect(Collectors.toSet());
   }
 
@@ -73,7 +82,7 @@ abstract class AbstractRepository<T>
     Class<T> type = getCollectionType();
     return mongoClient
         .getDatabase(pUserID)
-        .getCollection(type.getSimpleName().toLowerCase(), type);
+        .getCollection(getCollectionName(), type);
   }
 
 }

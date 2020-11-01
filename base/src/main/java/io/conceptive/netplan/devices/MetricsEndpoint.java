@@ -23,12 +23,12 @@ public class MetricsEndpoint
   protected IMetricRecordRepository metricsRepository;
 
   /**
-   * Returns all metrics for a single device
+   * Returns the latest records, combined by type
    *
    * @param pDeviceID ID of the device
    */
   @GET
-  @Path("/")
+  @Path("/records")
   @Produces(MediaType.APPLICATION_JSON)
   public Set<MetricRecord> get(@Nullable @PathParam("deviceID") String pDeviceID)
   {

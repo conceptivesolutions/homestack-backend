@@ -1,13 +1,14 @@
 package io.conceptive.netplan.repository.impl;
 
 import com.google.common.collect.Sets;
-import com.mongodb.client.model.Filters;
-import io.conceptive.netplan.core.model.Metric;
-import io.conceptive.netplan.repository.IMetricsRepository;
+import com.mongodb.BasicDBObject;
+import com.mongodb.client.model.*;
+import io.conceptive.netplan.core.model.MetricRecord;
+import io.conceptive.netplan.repository.IMetricRecordRepository;
 import org.jetbrains.annotations.NotNull;
 
 import javax.enterprise.context.Dependent;
-import java.util.Set;
+import java.util.*;
 
 /**
  * @author w.glanzer, 12.10.2020
@@ -20,13 +21,20 @@ public class MetricRecordRepositoryImpl extends AbstractRepository<MetricRecord>
   @Override
   public Set<MetricRecord> findAll(@NotNull String pDeviceID)
   {
-    return Sets.newHashSet(getCollection().find(Filters.eq("deviceID", pDeviceID)));
+    return Sets.newHashSet(getCollection().aggregate(List.of(
+        Aggregates.match(Filters.eq("deviceID", pDeviceID)), // filter only for device
+        Aggregates.sort(Sorts.descending("recordTime")), // sort all records by time
+        Aggregates.group("type", Accumulators.first("recordID", "$_id")), // group by type and get recentliest record
+        Aggregates.lookup(getCollectionName(), "recordID", "_id", "records"), // join ID on record
+        Aggregates.replaceRoot(new BasicDBObject("$arrayElemAt", new Object[]{"$records", 0})), // replace root
+        Aggregates.project(Projections.exclude("records")) // exclude previously selected records
+    )));
   }
 
   @Override
-  public void updateMetric(@NotNull String pUserID, @NotNull Metric pMetric)
+  public void addMetricRecord(@NotNull String pUserID, @NotNull MetricRecord pMetricRecord)
   {
-    getCollectionForUser(pUserID).replaceOne(Filters.and(Filters.eq("deviceID", pMetric.deviceID), Filters.eq("type", pMetric.type)), pMetric, UPSERT);
+    getCollectionForUser(pUserID).insertOne(pMetricRecord);
   }
 
   @NotNull
