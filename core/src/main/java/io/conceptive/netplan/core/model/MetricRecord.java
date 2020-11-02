@@ -21,7 +21,9 @@ public class MetricRecord
   public Date recordTime;
 
   /**
-   * Type of this metric (PING, TRACERT, etc.)
+   * Type of this metric (ping, tracert, etc.)
+   *
+   * @see Metric#type
    */
   public String type;
 

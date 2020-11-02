@@ -39,7 +39,7 @@ public class PingExecutor implements IMetricExecutor
 
   @NotNull
   @Override
-  public IMetricRecord execute(@NotNull Device pDevice)
+  public IMetricRecord execute(@NotNull Device pDevice, @NotNull IMetricPreferences pPreferences)
   {
     List<_PingResultObject> results = new ArrayList<>();
     Flowable.create(new _PingFlowable(pDevice), BackpressureStrategy.LATEST)

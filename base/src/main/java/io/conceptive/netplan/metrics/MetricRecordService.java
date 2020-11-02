@@ -9,7 +9,7 @@ import io.reactivex.Observable;
 import io.reactivex.*;
 import io.reactivex.disposables.Disposable;
 import io.reactivex.schedulers.Schedulers;
-import org.apache.commons.lang3.tuple.Pair;
+import org.apache.commons.lang3.tuple.Triple;
 import org.jboss.logging.Logger;
 import org.jetbrains.annotations.NotNull;
 
@@ -19,6 +19,7 @@ import javax.enterprise.inject.Instance;
 import javax.inject.Inject;
 import java.util.*;
 import java.util.concurrent.*;
+import java.util.stream.Collectors;
 
 /**
  * Service that updates the devices and performs health checks
@@ -38,7 +39,10 @@ public class MetricRecordService
   protected IDeviceRepository.ITokenlessRepository deviceRepository;
 
   @Inject
-  protected IMetricRecordRepository.ITokenlessRepository metricRepository;
+  protected IMetricRepository.ITokenlessRepository metricRepository;
+
+  @Inject
+  protected IMetricRecordRepository.ITokenlessRepository metricRecordRepository;
 
   @Inject
   protected Instance<IMetricExecutor> metricExecutors;
@@ -72,7 +76,7 @@ public class MetricRecordService
     return Flowable.interval(5, TimeUnit.SECONDS)
 
         // Only execute if it is correctly initialized
-        .filter(pL -> deviceRepository != null && metricRepository != null)
+        .filter(pL -> deviceRepository != null && metricRecordRepository != null && metricRepository != null)
 
         // Backpressure
         .onBackpressureDrop()
@@ -111,18 +115,24 @@ public class MetricRecordService
       // Retrieve devices
       Observable.fromIterable(deviceRepository.findAll(pUserID))
 
-          // Combine with executor
-          .flatMap(pDevice -> Observable.fromIterable(metricExecutors)
-              .map(pExecutor -> Pair.of(pDevice, pExecutor)))
+          // Combine with executor and preferences
+          .flatMap(pDevice -> {
+            Map<String, IMetricExecutor> executors = metricExecutors.stream().collect(Collectors.toMap(IMetricExecutor::getType, pE -> pE));
+            return Observable.fromIterable(metricRepository.findAll(pUserID, pDevice.id))
+                .filter(pMetric -> pMetric.enabled == Boolean.TRUE && executors.containsKey(pMetric.type))
+                .map(_PreferenceImpl::new)
+                .map(pPreference -> Triple.of(pDevice, executors.get(pPreference.metric.type), pPreference));
+          })
 
           // Execute all device/executor pairs in parallel
-          .map(pExecInfo -> {
-            Device device = pExecInfo.getLeft();
-            IMetricExecutor executor = pExecInfo.getRight();
+          .map(pDeviceExecutorPreference -> {
+            Device device = pDeviceExecutorPreference.getLeft();
+            IMetricExecutor executor = pDeviceExecutorPreference.getMiddle();
+            IMetricPreferences preference = pDeviceExecutorPreference.getRight();
 
             try
             {
-              IMetricRecord result = executor.execute(device);
+              IMetricRecord result = executor.execute(device, preference);
               return Optional.of(_toMetricRecord(device, executor, result));
             }
             catch (Throwable ex)
@@ -137,7 +147,7 @@ public class MetricRecordService
           .map(Optional::get)
 
           // Insert new metric
-          .blockingForEach(pRecord -> metricRepository.addMetricRecord(pUserID, pRecord));
+          .blockingForEach(pRecord -> metricRecordRepository.addMetricRecord(pUserID, pRecord));
     }
     catch (Throwable ex)
     {
@@ -163,5 +173,27 @@ public class MetricRecordService
     metricRecord.state = MetricRecord.EState.valueOf(pResult.getState().name());
     metricRecord.result = pResult.getResult();
     return metricRecord;
+  }
+
+  /**
+   * IMetricPreferences-Impl
+   */
+  private static class _PreferenceImpl implements IMetricPreferences
+  {
+    private final Metric metric;
+
+    public _PreferenceImpl(@NotNull Metric pMetric)
+    {
+      metric = pMetric;
+    }
+
+    @NotNull
+    @Override
+    public String getValue(@NotNull String pKey, @NotNull String pDefault)
+    {
+      if (metric.settings == null)
+        return pDefault;
+      return metric.settings.getOrDefault(pKey, pDefault);
+    }
   }
 }

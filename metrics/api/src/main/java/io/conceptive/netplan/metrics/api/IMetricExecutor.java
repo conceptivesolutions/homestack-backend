@@ -31,10 +31,11 @@ public interface IMetricExecutor
   /**
    * Executes this metric component for a given device
    *
-   * @param pDevice Device to check
+   * @param pDevice      Device to check
+   * @param pPreferences The Preferences for this metric execution
    * @return the result, not null
    */
   @NotNull
-  IMetricRecord execute(@NotNull Device pDevice);
+  IMetricRecord execute(@NotNull Device pDevice, @NotNull IMetricPreferences pPreferences);
 
 }
