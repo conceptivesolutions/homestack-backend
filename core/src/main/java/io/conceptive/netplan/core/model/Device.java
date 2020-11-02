@@ -20,6 +20,11 @@ public class Device
   public String hostID;
 
   /**
+   * Name of the icon for this device (maily present in gui)
+   */
+  public String icon;
+
+  /**
    * Address (IP or Hostname) of the device
    */
   public String address;

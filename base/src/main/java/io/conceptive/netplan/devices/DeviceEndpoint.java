@@ -108,6 +108,7 @@ public class DeviceEndpoint
     device.address = ObjectUtils.firstNonNull(pDevice.address, device.address);
     device.location = ObjectUtils.firstNonNull(pDevice.location, device.location);
     device.hostID = ObjectUtils.firstNonNull(pDevice.hostID, device.hostID);
+    device.icon = ObjectUtils.firstNonNull(pDevice.icon, device.icon);
     deviceRepository.updateDevice(device);
     return device;
   }
