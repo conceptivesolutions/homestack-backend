@@ -6,7 +6,7 @@ import io.conceptive.netplan.repository.IMetricRecordRepository;
 import org.jetbrains.annotations.*;
 
 import javax.enterprise.context.Dependent;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.*;
 
 /**
@@ -31,6 +31,7 @@ public class MetricRecordRepositoryImpl extends AbstractRepository<MetricRecord>
             .find(Filters.eq("deviceID", pDeviceID))
             .sort(Sorts.descending("recordTime"))
             .first())
+        .filter(Objects::nonNull)
         .collect(Collectors.toSet());
   }
 
