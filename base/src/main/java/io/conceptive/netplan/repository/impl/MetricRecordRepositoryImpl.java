@@ -3,7 +3,7 @@ package io.conceptive.netplan.repository.impl;
 import com.mongodb.client.model.*;
 import io.conceptive.netplan.core.model.MetricRecord;
 import io.conceptive.netplan.repository.IMetricRecordRepository;
-import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.*;
 
 import javax.enterprise.context.Dependent;
 import java.util.Set;
@@ -32,6 +32,17 @@ public class MetricRecordRepositoryImpl extends AbstractRepository<MetricRecord>
             .sort(Sorts.descending("recordTime"))
             .first())
         .collect(Collectors.toSet());
+  }
+
+  @Nullable
+  @Override
+  public MetricRecord findByType(@NotNull String pDeviceID, @NotNull String pType)
+  {
+    return mongoClient.getDatabase(getUserID())
+        .getCollection(_RECORDCOLLECTION_PREFIX + pType, MetricRecord.class)
+        .find(Filters.eq("deviceID", pDeviceID))
+        .sort(Sorts.descending("recordTime"))
+        .first();
   }
 
   @Override

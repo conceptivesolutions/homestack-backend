@@ -97,4 +97,25 @@ public class MetricsEndpoint
     return metricsRecordRepository.findAll(pDeviceID);
   }
 
+  /**
+   * Returns the latest record for a single metric type
+   *
+   * @param pDeviceID   ID of the device
+   * @param pMetricType Type of the metric to search
+   */
+  @GET
+  @Path("/records/{metricType}")
+  @Produces(MediaType.APPLICATION_JSON)
+  public MetricRecord getRecord(@Nullable @PathParam("deviceID") String pDeviceID, @Nullable @PathParam("metricType") String pMetricType)
+  {
+    if (pDeviceID == null || pDeviceID.isBlank() || pMetricType == null || pMetricType.isBlank())
+      throw new BadRequestException();
+
+    MetricRecord record = metricsRecordRepository.findByType(pDeviceID, pMetricType);
+    if (record == null)
+      throw new NotFoundException();
+
+    return record;
+  }
+
 }

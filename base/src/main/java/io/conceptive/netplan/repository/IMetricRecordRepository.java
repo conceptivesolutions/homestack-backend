@@ -1,7 +1,7 @@
 package io.conceptive.netplan.repository;
 
 import io.conceptive.netplan.core.model.MetricRecord;
-import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.*;
 
 import java.util.Set;
 
@@ -19,6 +19,16 @@ public interface IMetricRecordRepository
    */
   @NotNull
   Set<MetricRecord> findAll(@NotNull String pDeviceID);
+
+  /**
+   * Searches the record for a single device with the given metric type
+   *
+   * @param pDeviceID ID of the device
+   * @param pType     Type of the record to search for
+   * @return the record
+   */
+  @Nullable
+  MetricRecord findByType(@NotNull String pDeviceID, @NotNull String pType);
 
   /**
    * Contains all methods for tokenless access to the metrics repository
