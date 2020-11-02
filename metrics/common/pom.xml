@@ -9,8 +9,8 @@
     <version>1.0.0</version>
   </parent>
 
-  <artifactId>ping</artifactId>
-  <name>NetPlan IoT Backend: Metrics: Ping</name>
+  <artifactId>common</artifactId>
+  <name>NetPlan IoT Backend: Metrics: Common</name>
 
   <dependencies>
     <dependency>
@@ -19,6 +19,7 @@
       <version>${project.version}</version>
     </dependency>
 
+    <!-- Ping -->
     <dependency>
       <groupId>com.zaxxer</groupId>
       <artifactId>jnb-ping</artifactId>

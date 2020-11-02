@@ -16,7 +16,7 @@
 
   <modules>
     <module>api</module>
-    <module>ping</module>
+    <module>common</module>
   </modules>
 
 </project>
