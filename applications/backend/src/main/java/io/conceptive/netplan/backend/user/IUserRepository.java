@@ -1,4 +1,4 @@
-package io.conceptive.netplan.repository;
+package io.conceptive.netplan.backend.user;
 
 import org.jetbrains.annotations.NotNull;
 

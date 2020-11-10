@@ -1,8 +1,7 @@
-package io.conceptive.netplan.devices;
+package io.conceptive.netplan.backend.edge;
 
 import io.conceptive.netplan.core.IRole;
 import io.conceptive.netplan.core.model.Edge;
-import io.conceptive.netplan.repository.IEdgeRepository;
 import org.jetbrains.annotations.Nullable;
 
 import javax.annotation.security.RolesAllowed;

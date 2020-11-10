@@ -1,4 +1,4 @@
-package io.conceptive.netplan.repository;
+package io.conceptive.netplan.backend.edge;
 
 import io.conceptive.netplan.core.model.Edge;
 import org.jetbrains.annotations.NotNull;

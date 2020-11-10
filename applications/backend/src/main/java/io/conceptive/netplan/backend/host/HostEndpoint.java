@@ -1,8 +1,7 @@
-package io.conceptive.netplan.devices;
+package io.conceptive.netplan.backend.host;
 
 import io.conceptive.netplan.core.IRole;
 import io.conceptive.netplan.core.model.Host;
-import io.conceptive.netplan.repository.IHostRepository;
 import org.apache.commons.lang3.ObjectUtils;
 import org.jetbrains.annotations.Nullable;
 

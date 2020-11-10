@@ -4,13 +4,13 @@
   <modelVersion>4.0.0</modelVersion>
 
   <parent>
-    <groupId>io.conceptive.netplan</groupId>
-    <artifactId>backend-parent</artifactId>
+    <groupId>io.conceptive.netplan.applications</groupId>
+    <artifactId>applications-parent</artifactId>
     <version>1.0.0</version>
   </parent>
 
-  <artifactId>base</artifactId>
-  <name>NetPlan IoT Backend: Base</name>
+  <artifactId>satellite</artifactId>
+  <name>NetPlan IoT Backend: Application: Satellite</name>
 
   <dependencies>
     <dependency>
@@ -18,6 +18,8 @@
       <artifactId>core</artifactId>
       <version>${project.version}</version>
     </dependency>
+
+    <!-- Metrics: Common -->
     <dependency>
       <groupId>io.conceptive.netplan.metrics</groupId>
       <artifactId>common</artifactId>
@@ -28,24 +30,6 @@
     <dependency>
       <groupId>io.quarkus</groupId>
       <artifactId>quarkus-resteasy-jsonb</artifactId>
-    </dependency>
-
-    <!-- OpenID Connect -->
-    <dependency>
-      <groupId>io.quarkus</groupId>
-      <artifactId>quarkus-oidc</artifactId>
-    </dependency>
-
-    <!-- MongoDB Client -->
-    <dependency>
-      <groupId>io.quarkus</groupId>
-      <artifactId>quarkus-mongodb-client</artifactId>
-    </dependency>
-
-    <!-- OpenAPI-Documentation -->
-    <dependency>
-      <groupId>io.quarkus</groupId>
-      <artifactId>quarkus-smallrye-openapi</artifactId>
     </dependency>
   </dependencies>
 

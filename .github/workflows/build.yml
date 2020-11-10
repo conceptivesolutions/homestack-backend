@@ -32,9 +32,16 @@ jobs:
           username: ${{ secrets.nexus_user }}
           password: ${{ secrets.nexus_password }}
 
-      # Create Docker Images for Native Modules
-      - name: Create Docker Images
-        working-directory: ./base
+      # Create Docker Image
+      - name: Create Backend Image
+        working-directory: ./applications/backend
         run: |
           docker build -f src/main/docker/Dockerfile.jvm -t images.conceptive.io/netplan.backend:latest .
           docker push images.conceptive.io/netplan.backend:latest
+
+      # Create Docker Image
+      - name: Create Satellite Image
+        working-directory: ./applications/satellite
+        run: |
+          docker build -f src/main/docker/Dockerfile.jvm -t images.conceptive.io/netplan.satellite:latest .
+          docker push images.conceptive.io/netplan.satellite:latest

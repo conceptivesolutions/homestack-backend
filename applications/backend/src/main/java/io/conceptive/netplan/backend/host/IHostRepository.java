@@ -1,4 +1,4 @@
-package io.conceptive.netplan.repository;
+package io.conceptive.netplan.backend.host;
 
 import io.conceptive.netplan.core.model.Host;
 import org.jetbrains.annotations.*;

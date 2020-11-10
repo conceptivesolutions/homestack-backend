@@ -1,4 +1,4 @@
-package io.conceptive.netplan.repository;
+package io.conceptive.netplan.backend.device;
 
 import io.conceptive.netplan.core.model.Device;
 import org.jetbrains.annotations.*;

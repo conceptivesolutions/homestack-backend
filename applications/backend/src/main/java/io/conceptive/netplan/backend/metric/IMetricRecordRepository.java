@@ -1,4 +1,4 @@
-package io.conceptive.netplan.repository;
+package io.conceptive.netplan.backend.metric;
 
 import io.conceptive.netplan.core.model.MetricRecord;
 import org.jetbrains.annotations.*;

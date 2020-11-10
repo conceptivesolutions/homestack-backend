@@ -1,4 +1,4 @@
-package io.conceptive.netplan.repository.impl;
+package io.conceptive.netplan.backend;
 
 import com.mongodb.client.*;
 import com.mongodb.client.model.ReplaceOptions;
@@ -13,7 +13,7 @@ import java.util.stream.*;
 /**
  * @author w.glanzer, 16.10.2020
  */
-abstract class AbstractRepository<T>
+public abstract class AbstractRepository<T>
 {
   protected static final ReplaceOptions UPSERT = new ReplaceOptions().upsert(true);
 

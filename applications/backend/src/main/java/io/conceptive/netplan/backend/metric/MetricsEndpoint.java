@@ -1,8 +1,7 @@
-package io.conceptive.netplan.devices;
+package io.conceptive.netplan.backend.metric;
 
 import io.conceptive.netplan.core.IRole;
 import io.conceptive.netplan.core.model.*;
-import io.conceptive.netplan.repository.*;
 import org.jetbrains.annotations.Nullable;
 
 import javax.annotation.security.RolesAllowed;

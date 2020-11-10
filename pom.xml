@@ -55,7 +55,7 @@
   </dependencyManagement>
 
   <modules>
-    <module>base</module>
+    <module>applications</module>
     <module>core</module>
     <module>metrics</module>
   </modules>

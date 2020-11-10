@@ -1,8 +1,7 @@
-package io.conceptive.netplan.devices;
+package io.conceptive.netplan.backend.device;
 
 import io.conceptive.netplan.core.IRole;
 import io.conceptive.netplan.core.model.Device;
-import io.conceptive.netplan.repository.IDeviceRepository;
 import org.apache.commons.lang3.ObjectUtils;
 import org.jetbrains.annotations.Nullable;
 
