@@ -1,0 +1,8 @@
+<component name="ProjectRunConfigurationManager">
+  <configuration default="false" name="Backend" type="QuarkusMavenBridge">
+    <option name="jreName" value="11" />
+    <option name="vmOptions" />
+    <option name="workingDir" value="$PROJECT_DIR$/backend" />
+    <method v="2" />
+  </configuration>
+</component>
