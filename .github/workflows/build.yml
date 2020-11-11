@@ -21,6 +21,12 @@ jobs:
         with:
           java-version: 11
 
+      # Init settings.xml for Maven Build
+      - name: Generate settings.xml
+        uses: s4u/maven-settings-action@v2.2.0
+        with:
+          servers: '[{"id": "default", "username": "{{ secrets.nexus_user }}", "password": "{{ secrets.nexus_password }}"}]'
+
       # Build all modules with tests enabled
       - name: Build JVM Mode
         run: mvn -B clean install
