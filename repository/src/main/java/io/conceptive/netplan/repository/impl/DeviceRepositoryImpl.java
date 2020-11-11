@@ -1,10 +1,10 @@
-package io.conceptive.netplan.backend.device;
+package io.conceptive.netplan.repository.impl;
 
 import com.google.common.collect.Sets;
 import com.mongodb.BasicDBObject;
 import com.mongodb.client.model.Filters;
-import io.conceptive.netplan.backend.AbstractRepository;
 import io.conceptive.netplan.model.data.DeviceDataModel;
+import io.conceptive.netplan.repository.api.IDeviceRepository;
 import org.jetbrains.annotations.*;
 
 import javax.enterprise.context.Dependent;

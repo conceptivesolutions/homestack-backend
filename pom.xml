@@ -64,6 +64,7 @@
 
   <modules>
     <module>backend</module>
+    <module>repository</module>
   </modules>
 
   <dependencies>

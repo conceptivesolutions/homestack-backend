@@ -1,9 +1,9 @@
-package io.conceptive.netplan.backend.metric;
+package io.conceptive.netplan.repository.impl;
 
 import com.google.common.collect.Sets;
 import com.mongodb.client.model.Filters;
-import io.conceptive.netplan.backend.AbstractRepository;
 import io.conceptive.netplan.model.data.MetricDataModel;
+import io.conceptive.netplan.repository.api.IMetricRepository;
 import org.jetbrains.annotations.NotNull;
 
 import javax.enterprise.context.Dependent;

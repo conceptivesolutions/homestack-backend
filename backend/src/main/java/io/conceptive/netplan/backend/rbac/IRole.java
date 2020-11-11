@@ -1,4 +1,4 @@
-package io.conceptive.netplan.backend;
+package io.conceptive.netplan.backend.rbac;
 
 /**
  * Contains all RBAC-Role-Names

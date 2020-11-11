@@ -1,9 +1,9 @@
-package io.conceptive.netplan.backend.host;
+package io.conceptive.netplan.repository.impl;
 
 import com.google.common.collect.Sets;
 import com.mongodb.client.model.Filters;
-import io.conceptive.netplan.backend.AbstractRepository;
 import io.conceptive.netplan.model.data.HostDataModel;
+import io.conceptive.netplan.repository.api.IHostRepository;
 import org.jetbrains.annotations.*;
 
 import javax.enterprise.context.Dependent;

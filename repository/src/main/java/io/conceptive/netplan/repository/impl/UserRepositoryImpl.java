@@ -1,7 +1,8 @@
-package io.conceptive.netplan.backend.user;
+package io.conceptive.netplan.repository.impl;
 
 import com.google.common.collect.Sets;
 import com.mongodb.client.MongoClient;
+import io.conceptive.netplan.repository.api.IUserRepository;
 import org.jetbrains.annotations.NotNull;
 
 import javax.enterprise.context.ApplicationScoped;

@@ -1,8 +1,8 @@
-package io.conceptive.netplan.backend.metric;
+package io.conceptive.netplan.repository.impl;
 
 import com.mongodb.client.model.*;
-import io.conceptive.netplan.backend.AbstractRepository;
 import io.conceptive.netplan.model.data.MetricRecordDataModel;
+import io.conceptive.netplan.repository.api.IMetricRecordRepository;
 import org.jetbrains.annotations.*;
 
 import javax.enterprise.context.Dependent;

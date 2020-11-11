@@ -1,9 +1,9 @@
-package io.conceptive.netplan.backend.edge;
+package io.conceptive.netplan.repository.impl;
 
 import com.google.common.collect.Sets;
 import com.mongodb.client.model.Filters;
-import io.conceptive.netplan.backend.AbstractRepository;
 import io.conceptive.netplan.model.data.EdgeDataModel;
+import io.conceptive.netplan.repository.api.IEdgeRepository;
 import org.bson.conversions.Bson;
 import org.jetbrains.annotations.NotNull;
 
