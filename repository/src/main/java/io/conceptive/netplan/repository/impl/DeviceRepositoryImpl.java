@@ -16,7 +16,7 @@ import java.util.Set;
  * @author w.glanzer, 13.09.2020
  */
 @Dependent
-public class DeviceRepositoryImpl extends AbstractRepository<DeviceDataModel> implements IDeviceRepository, IDeviceRepository.ITokenlessRepository
+class DeviceRepositoryImpl extends AbstractRepository<DeviceDataModel> implements IDeviceRepository, IDeviceRepository.ITokenlessRepository
 {
 
   @NotNull

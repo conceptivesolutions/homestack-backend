@@ -13,7 +13,7 @@ import java.util.Set;
  * @author w.glanzer, 02.11.2020
  */
 @Dependent
-public class MetricRepositoryImpl extends AbstractRepository<MetricDataModel> implements IMetricRepository, IMetricRepository.ITokenlessRepository
+class MetricRepositoryImpl extends AbstractRepository<MetricDataModel> implements IMetricRepository, IMetricRepository.ITokenlessRepository
 {
   @NotNull
   @Override

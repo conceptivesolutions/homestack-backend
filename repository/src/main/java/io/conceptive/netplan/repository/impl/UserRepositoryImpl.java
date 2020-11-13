@@ -13,7 +13,7 @@ import java.util.Set;
  * @author w.glanzer, 16.10.2020
  */
 @ApplicationScoped
-public class UserRepositoryImpl implements IUserRepository
+class UserRepositoryImpl implements IUserRepository
 {
 
   @Inject

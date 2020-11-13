@@ -13,7 +13,7 @@ import java.util.stream.*;
  * @author w.glanzer, 12.10.2020
  */
 @Dependent
-public class MetricRecordRepositoryImpl extends AbstractRepository<MetricRecordDataModel> implements IMetricRecordRepository, IMetricRecordRepository.ITokenlessRepository
+class MetricRecordRepositoryImpl extends AbstractRepository<MetricRecordDataModel> implements IMetricRecordRepository, IMetricRecordRepository.ITokenlessRepository
 {
 
   private static final String _RECORDCOLLECTION_PREFIX = "records_";

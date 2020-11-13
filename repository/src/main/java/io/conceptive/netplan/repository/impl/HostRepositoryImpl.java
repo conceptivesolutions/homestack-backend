@@ -13,7 +13,7 @@ import java.util.Set;
  * @author w.glanzer, 16.10.2020
  */
 @Dependent
-public class HostRepositoryImpl extends AbstractRepository<HostDataModel> implements IHostRepository
+class HostRepositoryImpl extends AbstractRepository<HostDataModel> implements IHostRepository
 {
 
   @NotNull

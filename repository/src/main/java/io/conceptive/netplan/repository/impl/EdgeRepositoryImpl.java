@@ -14,7 +14,7 @@ import java.util.*;
  * @author w.glanzer, 12.10.2020
  */
 @Dependent
-public class EdgeRepositoryImpl extends AbstractRepository<EdgeDataModel> implements IEdgeRepository
+class EdgeRepositoryImpl extends AbstractRepository<EdgeDataModel> implements IEdgeRepository
 {
 
   @NotNull
