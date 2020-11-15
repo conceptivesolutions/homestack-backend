@@ -52,6 +52,7 @@ class SatelliteMessageHandler implements MessageHandler.Whole<WebsocketEvent>
     if (pEvent.equalType(SatelliteWebSocketEvents.AUTHENTICATE))
     {
       AuthenticateEventData data = SatelliteWebSocketEvents.AUTHENTICATE.payloadOf(pEvent);
+      session.getUserProperties().put(_SESSIONKEY_AUTHORIZED, true);
       session.getUserProperties().put(_SESSIONKEY_SATELLITE_ID, data.id);
       session.getUserProperties().put(_SESSIONKEY_SATELLITE_VERSION, data.version);
 
@@ -62,6 +63,7 @@ class SatelliteMessageHandler implements MessageHandler.Whole<WebsocketEvent>
     {
       try
       {
+        session.getUserProperties().put(_SESSIONKEY_AUTHORIZED, false);
         session.close(new CloseReason(CloseReason.CloseCodes.PROTOCOL_ERROR, "Unauthorized"));
       }
       catch (Exception e)
