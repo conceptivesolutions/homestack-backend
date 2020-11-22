@@ -11,6 +11,10 @@
           <option name="goals">
             <list>
               <option value="quarkus:dev" />
+              <option value="-Ddb.user=homestackdev" />
+              <option value="-Ddb.password=homestackdev" />
+              <option value="-Ddb.host=loku-worker-1.home.lan" />
+              <option value="-Ddb.port=31825" />
             </list>
           </option>
           <option name="pomFileName" value="pom.xml" />

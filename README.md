@@ -1,4 +1,4 @@
-# NetPlan IoT
+# HomeStack
 
 ## Backend
 
