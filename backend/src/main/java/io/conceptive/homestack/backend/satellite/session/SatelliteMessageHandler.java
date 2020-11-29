@@ -1,6 +1,7 @@
 package io.conceptive.homestack.backend.satellite.session;
 
-import io.conceptive.homestack.model.data.DeviceDataModel;
+import io.conceptive.homestack.backend.satellite.auth.ISatelliteAuthenticator;
+import io.conceptive.homestack.model.data.*;
 import io.conceptive.homestack.model.satellite.SatelliteConfigurationDataModel;
 import io.conceptive.homestack.model.satellite.events.SatelliteWebSocketEvents;
 import io.conceptive.homestack.model.satellite.events.data.AuthenticateEventData;
@@ -22,10 +23,12 @@ class SatelliteMessageHandler implements MessageHandler.Whole<WebsocketEvent>
   private static final String _SESSIONKEY_AUTHORIZED = "authorized";
   private static final String _SESSIONKEY_SATELLITE_ID = "id";
   private static final String _SESSIONKEY_SATELLITE_VERSION = "version";
+  private final ISatelliteAuthenticator authenticator;
   private final Session session;
 
-  public SatelliteMessageHandler(@NotNull Session pSession)
+  public SatelliteMessageHandler(@NotNull ISatelliteAuthenticator pAuthenticator, @NotNull Session pSession)
   {
+    authenticator = pAuthenticator;
     session = pSession;
   }
 
@@ -51,26 +54,38 @@ class SatelliteMessageHandler implements MessageHandler.Whole<WebsocketEvent>
   {
     if (pEvent.equalType(SatelliteWebSocketEvents.AUTHENTICATE))
     {
-      AuthenticateEventData data = SatelliteWebSocketEvents.AUTHENTICATE.payloadOf(pEvent);
-      session.getUserProperties().put(_SESSIONKEY_AUTHORIZED, true);
-      session.getUserProperties().put(_SESSIONKEY_SATELLITE_ID, data.id);
-      session.getUserProperties().put(_SESSIONKEY_SATELLITE_VERSION, data.version);
+      String satelliteID = null;
+      String version = null;
 
-      // answer with (initial) config
-      session.getAsyncRemote().sendObject(SatelliteWebSocketEvents.CONFIG.payload(_getConfig()));
-    }
-    else
-    {
       try
       {
-        session.getUserProperties().put(_SESSIONKEY_AUTHORIZED, false);
-        session.close(new CloseReason(CloseReason.CloseCodes.PROTOCOL_ERROR, "Unauthorized"));
+        AuthenticateEventData data = SatelliteWebSocketEvents.AUTHENTICATE.payloadOf(pEvent);
+        satelliteID = data.id;
+        version = data.version;
+
+        // just ignore invalid requests
+        if (satelliteID == null || satelliteID.isBlank() || data.token == null || data.token.isBlank())
+          return;
+
+        // Authenticate (throws Exception, if invalid)
+        authenticator.authenticate(satelliteID, data.token);
+
+        // set information to session because we know, that we are now authenticated - because of JWT decoded sucessfully
+        session.getUserProperties().put(_SESSIONKEY_AUTHORIZED, true);
+        session.getUserProperties().put(_SESSIONKEY_SATELLITE_ID, satelliteID);
+        session.getUserProperties().put(_SESSIONKEY_SATELLITE_VERSION, version);
+
+        // answer with (initial) config
+        session.getAsyncRemote().sendObject(SatelliteWebSocketEvents.CONFIG.payload(_createConfig()));
       }
       catch (Exception e)
       {
-        // should not happen - the session is already closed
+        _killSession();
+        Logger.getLogger(SatelliteMessageHandler.class).warn("Failed to authenticate satellite (" + satelliteID + ", " + version + ")");
       }
     }
+    else
+      _killSession();
   }
 
   /**
@@ -83,14 +98,39 @@ class SatelliteMessageHandler implements MessageHandler.Whole<WebsocketEvent>
     Logger.getLogger(SatelliteMessageHandler.class).warn(pEvent + " was not handled, because no handler was registered for it");
   }
 
-  //todo
-  private SatelliteConfigurationDataModel _getConfig()
+  /**
+   * Kills the current
+   */
+  private void _killSession()
+  {
+    try
+    {
+      session.getUserProperties().put(_SESSIONKEY_AUTHORIZED, false);
+      session.close(new CloseReason(CloseReason.CloseCodes.PROTOCOL_ERROR, "Unauthorized"));
+    }
+    catch (Exception e)
+    {
+      // should not happen - the session is already closed
+    }
+  }
+
+  /**
+   * @return
+   */
+  @NotNull
+  private SatelliteConfigurationDataModel _createConfig()
   {
     // todo
     SatelliteConfigurationDataModel model = new SatelliteConfigurationDataModel();
     DeviceDataModel devModel = new DeviceDataModel();
     devModel.id = "newDev";
+    devModel.address = "127.0.0.1";
     model.devices = Set.of(devModel);
+    MetricDataModel metric = new MetricDataModel();
+    metric.type = "ping";
+    metric.deviceID = "newDev";
+    metric.enabled = true;
+    model.metrics = Set.of(metric);
     return model;
   }
 
