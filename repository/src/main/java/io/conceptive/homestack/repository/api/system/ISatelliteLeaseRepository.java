@@ -1,6 +1,6 @@
 package io.conceptive.homestack.repository.api.system;
 
-import io.conceptive.homestack.model.data.satellite.LeaseDataModel;
+import io.conceptive.homestack.model.data.satellite.SatelliteLeaseDataModel;
 import org.jetbrains.annotations.*;
 
 import java.util.Set;
@@ -10,7 +10,7 @@ import java.util.Set;
  *
  * @author w.glanzer, 29.11.2020
  */
-public interface ISatelliteRepository
+public interface ISatelliteLeaseRepository
 {
 
   /**
@@ -21,7 +21,7 @@ public interface ISatelliteRepository
    * @return the leases for the user and its satellites
    */
   @NotNull
-  Set<LeaseDataModel> findAll(@NotNull String pUserID);
+  Set<SatelliteLeaseDataModel> findAll(@NotNull String pUserID);
 
   /**
    * Searches a lease with the given ID
@@ -30,14 +30,14 @@ public interface ISatelliteRepository
    * @return the lease, or null if not found
    */
   @Nullable
-  LeaseDataModel findByID(@NotNull String pLeaseID);
+  SatelliteLeaseDataModel findByID(@NotNull String pLeaseID);
 
   /**
    * Inserts or updates the lease
    *
    * @param pLease given lease to be updated / inserted (determined by id)
    */
-  void upsertLease(@NotNull LeaseDataModel pLease);
+  void upsertLease(@NotNull SatelliteLeaseDataModel pLease);
 
   /**
    * Generates a new lease for a single satellite
@@ -46,6 +46,6 @@ public interface ISatelliteRepository
    * @return a new lease to use
    */
   @NotNull
-  LeaseDataModel generateLease(@NotNull String pUserID);
+  SatelliteLeaseDataModel generateLease(@NotNull String pUserID);
 
 }

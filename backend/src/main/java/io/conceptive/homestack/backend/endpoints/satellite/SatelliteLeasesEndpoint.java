@@ -1,8 +1,8 @@
 package io.conceptive.homestack.backend.endpoints.satellite;
 
 import io.conceptive.homestack.backend.rbac.IRole;
-import io.conceptive.homestack.model.data.satellite.LeaseDataModel;
-import io.conceptive.homestack.repository.api.system.ISatelliteRepository;
+import io.conceptive.homestack.model.data.satellite.SatelliteLeaseDataModel;
+import io.conceptive.homestack.repository.api.system.ISatelliteLeaseRepository;
 import org.eclipse.microprofile.jwt.JsonWebToken;
 import org.jetbrains.annotations.NotNull;
 
@@ -11,8 +11,6 @@ import javax.inject.Inject;
 import javax.ws.rs.*;
 import javax.ws.rs.core.*;
 import java.time.Instant;
-import java.util.Set;
-import java.util.stream.Collectors;
 
 /**
  * Endpoint to retrieve / create leases for satellites
@@ -28,29 +26,16 @@ public class SatelliteLeasesEndpoint
   protected JsonWebToken token;
 
   @Inject
-  protected ISatelliteRepository satelliteRepository;
+  protected ISatelliteLeaseRepository satelliteLeaseRepository;
 
   /**
    * Generates a new lease for a satellite to connect
    */
   @PUT
   @Produces(MediaType.APPLICATION_JSON)
-  public LeaseDataModel generateLease()
+  public SatelliteLeaseDataModel generateLease()
   {
-    return satelliteRepository.generateLease(token.getSubject());
-  }
-
-  /**
-   * Returns all valid leases (without token) for the current user
-   */
-  @GET
-  @Produces(MediaType.APPLICATION_JSON)
-  public Set<LeaseDataModel> get()
-  {
-    return satelliteRepository.findAll(token.getSubject()).stream()
-        .filter(pModel -> pModel.revokedDate == null)
-        .peek(pModel -> pModel.token = null) // token should definitely not be publicly present
-        .collect(Collectors.toSet());
+    return satelliteLeaseRepository.generateLease(token.getSubject());
   }
 
   /**
@@ -62,7 +47,7 @@ public class SatelliteLeasesEndpoint
   @Path("/{id}")
   public Response revoke(@NotNull @PathParam("id") String pLeaseID)
   {
-    LeaseDataModel lease = satelliteRepository.findByID(pLeaseID);
+    SatelliteLeaseDataModel lease = satelliteLeaseRepository.findByID(pLeaseID);
 
     // found?
     if (lease == null)
@@ -73,7 +58,7 @@ public class SatelliteLeasesEndpoint
       return Response.notModified().build();
 
     lease.revokedDate = Instant.now();
-    satelliteRepository.upsertLease(lease);
+    satelliteLeaseRepository.upsertLease(lease);
 
     // ok, revoked
     return Response.ok().build();
