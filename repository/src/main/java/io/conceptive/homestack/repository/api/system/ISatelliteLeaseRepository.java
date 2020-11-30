@@ -46,6 +46,6 @@ public interface ISatelliteLeaseRepository
    * @return a new lease to use
    */
   @NotNull
-  SatelliteLeaseDataModel generateLease(@NotNull String pUserID);
+  SatelliteLeaseDataModel generateLease(@NotNull String pUserID, @NotNull String pSatelliteID);
 
 }

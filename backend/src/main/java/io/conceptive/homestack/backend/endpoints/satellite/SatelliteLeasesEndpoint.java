@@ -11,6 +11,7 @@ import javax.inject.Inject;
 import javax.ws.rs.*;
 import javax.ws.rs.core.*;
 import java.time.Instant;
+import java.util.Objects;
 
 /**
  * Endpoint to retrieve / create leases for satellites
@@ -18,7 +19,7 @@ import java.time.Instant;
  * @author w.glanzer, 29.11.2020
  */
 @RolesAllowed(IRole.DEFAULT)
-@Path("/satellites/leases")
+@Path("/satellites/{id}/leases")
 public class SatelliteLeasesEndpoint
 {
 
@@ -33,9 +34,9 @@ public class SatelliteLeasesEndpoint
    */
   @PUT
   @Produces(MediaType.APPLICATION_JSON)
-  public SatelliteLeaseDataModel generateLease()
+  public SatelliteLeaseDataModel generateLease(@NotNull @PathParam("id") String pSatelliteID)
   {
-    return satelliteLeaseRepository.generateLease(token.getSubject());
+    return satelliteLeaseRepository.generateLease(token.getSubject(), pSatelliteID);
   }
 
   /**
@@ -44,13 +45,13 @@ public class SatelliteLeasesEndpoint
    * @param pLeaseID ID of the id to revoke
    */
   @DELETE
-  @Path("/{id}")
-  public Response revoke(@NotNull @PathParam("id") String pLeaseID)
+  @Path("/{leaseID}")
+  public Response revoke(@NotNull @PathParam("id") String pSatelliteID, @NotNull @PathParam("leaseID") String pLeaseID)
   {
     SatelliteLeaseDataModel lease = satelliteLeaseRepository.findByID(pLeaseID);
 
     // found?
-    if (lease == null)
+    if (lease == null || !Objects.equals(lease.satelliteID, pSatelliteID))
       throw new NotFoundException();
 
     // already revoked?

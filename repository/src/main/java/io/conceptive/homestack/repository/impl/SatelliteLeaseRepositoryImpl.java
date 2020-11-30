@@ -44,10 +44,11 @@ class SatelliteLeaseRepositoryImpl implements ISatelliteLeaseRepository
 
   @NotNull
   @Override
-  public SatelliteLeaseDataModel generateLease(@NotNull String pUserID)
+  public SatelliteLeaseDataModel generateLease(@NotNull String pUserID, @NotNull String pSatelliteID)
   {
     SatelliteLeaseDataModel lease = new SatelliteLeaseDataModel();
     lease.userID = pUserID;
+    lease.satelliteID = pSatelliteID;
     lease.id = RandomStringUtils.randomAlphanumeric(64);
     lease.token = RandomStringUtils.randomAlphanumeric(32);
     upsertLease(lease);
