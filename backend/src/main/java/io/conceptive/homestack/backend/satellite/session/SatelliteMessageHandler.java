@@ -60,15 +60,14 @@ class SatelliteMessageHandler implements MessageHandler.Whole<WebsocketEvent>
       try
       {
         AuthenticateEventData data = SatelliteWebSocketEvents.AUTHENTICATE.payloadOf(pEvent);
-        satelliteID = data.id;
         version = data.version;
 
         // just ignore invalid requests
-        if (satelliteID == null || satelliteID.isBlank() || data.token == null || data.token.isBlank())
+        if (data.leaseID == null || data.leaseID.isBlank() || data.leaseToken == null || data.leaseToken.isBlank())
           return;
 
-        // Authenticate (throws Exception, if invalid)
-        authenticator.authenticate(satelliteID, data.token);
+        // Authenticate (throws Exception, if invalid) and get satellite id
+        satelliteID = authenticator.authenticate(data.leaseID, data.leaseToken);
 
         // set information to session because we know, that we are now authenticated - because of JWT decoded sucessfully
         session.getUserProperties().put(_SESSIONKEY_AUTHORIZED, true);

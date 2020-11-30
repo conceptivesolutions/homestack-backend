@@ -18,24 +18,27 @@ class SatelliteAuthenticator implements ISatelliteAuthenticator
 {
 
   @Inject
-  protected ISatelliteLeaseRepository satelliteRepository;
+  protected ISatelliteLeaseRepository satelliteLeaseRepository;
 
+  @NotNull
   @Override
-  public void authenticate(@NotNull String pSatelliteID, @NotNull String pToken) throws AuthenticationFailedException
+  public String authenticate(@NotNull String pLeaseID, @NotNull String pLeaseToken) throws AuthenticationFailedException
   {
-    SatelliteLeaseDataModel lease = satelliteRepository.findByID(pSatelliteID);
+    SatelliteLeaseDataModel lease = satelliteLeaseRepository.findByID(pLeaseID);
 
     // No Lease found
     if (lease == null)
-      throw new AuthenticationFailedException("No valid lease found (" + pSatelliteID + ")");
+      throw new AuthenticationFailedException("No valid lease found (" + pLeaseID + ")");
 
     // Already revoked by user
     if (lease.revokedDate != null && lease.revokedDate.isAfter(Instant.now()))
-      throw new AuthenticationFailedException("Lease was revoked (" + pSatelliteID + ")");
+      throw new AuthenticationFailedException("Lease was revoked (" + pLeaseID + ")");
 
     // Check Token
-    if (!Objects.equals(lease.token, pToken))
-      throw new AuthenticationFailedException("Valid lease found, but tokens do not match (" + pSatelliteID + ")");
+    if (!Objects.equals(lease.token, pLeaseToken))
+      throw new AuthenticationFailedException("Valid lease found, but tokens do not match (" + pLeaseID + ")");
+
+    return lease.satelliteID;
   }
 
 }

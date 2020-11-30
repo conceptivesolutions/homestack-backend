@@ -12,10 +12,12 @@ public interface ISatelliteAuthenticator
   /**
    * Tries to authenticate the satellite with the given ID and the given token
    *
-   * @param pSatelliteID ID of the satellite to authenticate
-   * @param pToken       The token
+   * @param pLeaseID    ID of the lease to authenticate with
+   * @param pLeaseToken The token
+   * @return the satellite id that authenticated successfully
    * @throws AuthenticationFailedException if the authentication and token verification failed
    */
-  void authenticate(@NotNull String pSatelliteID, @NotNull String pToken) throws AuthenticationFailedException;
+  @NotNull
+  String authenticate(@NotNull String pLeaseID, @NotNull String pLeaseToken) throws AuthenticationFailedException;
 
 }
