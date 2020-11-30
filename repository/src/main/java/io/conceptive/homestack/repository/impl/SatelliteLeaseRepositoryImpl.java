@@ -55,6 +55,12 @@ class SatelliteLeaseRepositoryImpl implements ISatelliteLeaseRepository
     return lease;
   }
 
+  @Override
+  public void deleteBySatelliteID(@NotNull String pUserID, @NotNull String pSatelliteID)
+  {
+    _getCollection().deleteMany(Filters.and(Filters.eq("userID", pUserID), Filters.eq("satelliteID", pSatelliteID)));
+  }
+
   @NotNull
   private MongoCollection<SatelliteLeaseDataModel> _getCollection()
   {

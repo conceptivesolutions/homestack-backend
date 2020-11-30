@@ -48,4 +48,12 @@ public interface ISatelliteLeaseRepository
   @NotNull
   SatelliteLeaseDataModel generateLease(@NotNull String pUserID, @NotNull String pSatelliteID);
 
+  /**
+   * Deletes all leases with the given satellite id for the given user
+   *
+   * @param pUserID      ID of the user
+   * @param pSatelliteID ID of the satellite to delete the leases for
+   */
+  void deleteBySatelliteID(@NotNull String pUserID, @NotNull String pSatelliteID);
+
 }
