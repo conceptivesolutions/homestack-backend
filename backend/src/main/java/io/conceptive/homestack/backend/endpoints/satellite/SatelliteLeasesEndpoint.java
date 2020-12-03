@@ -11,7 +11,8 @@ import javax.inject.Inject;
 import javax.ws.rs.*;
 import javax.ws.rs.core.*;
 import java.time.Instant;
-import java.util.Objects;
+import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * Endpoint to retrieve / create leases for satellites
@@ -28,6 +29,21 @@ public class SatelliteLeasesEndpoint
 
   @Inject
   protected ISatelliteLeaseRepository satelliteLeaseRepository;
+
+  /**
+   * Returns all currently known leases for this satellite,
+   * including ones that were revoked.
+   * Does not include important data, such as token.
+   */
+  @GET
+  @Produces(MediaType.APPLICATION_JSON)
+  public Set<SatelliteLeaseDataModel> getLeaseIDs(@NotNull @PathParam("id") String pSatelliteID)
+  {
+    return satelliteLeaseRepository.findAll(token.getSubject()).stream()
+        .filter(pLease -> Objects.equals(pSatelliteID, pLease.satelliteID))
+        .peek(pModel -> pModel.token = null)
+        .collect(Collectors.toSet());
+  }
 
   /**
    * Generates a new lease for a satellite to connect
