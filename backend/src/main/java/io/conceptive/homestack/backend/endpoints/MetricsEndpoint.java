@@ -2,7 +2,7 @@ package io.conceptive.homestack.backend.endpoints;
 
 import io.conceptive.homestack.backend.rbac.IRole;
 import io.conceptive.homestack.model.data.*;
-import io.conceptive.homestack.repository.api.*;
+import io.conceptive.homestack.repository.api.user.*;
 import org.jetbrains.annotations.Nullable;
 
 import javax.annotation.security.RolesAllowed;
@@ -20,10 +20,10 @@ public class MetricsEndpoint
 {
 
   @Inject
-  protected IMetricRepository metricRepository;
+  protected IMetricUserRepository metricRepository;
 
   @Inject
-  protected IMetricRecordRepository metricsRecordRepository;
+  protected IMetricRecordUserRepository metricsRecordRepository;
 
   /**
    * Returns all metrics for a single device
@@ -38,7 +38,7 @@ public class MetricsEndpoint
     if (pDeviceID == null || pDeviceID.isBlank())
       throw new BadRequestException();
 
-    return metricRepository.findAll(pDeviceID);
+    return metricRepository.findAllByDeviceID(pDeviceID);
   }
 
   /**
@@ -60,7 +60,7 @@ public class MetricsEndpoint
     pMetric.deviceID = pDeviceID;
     pMetric.type = pMetricType;
 
-    metricRepository.insertMetric(pMetric);
+    metricRepository.upsert(pMetric);
     return pMetric;
   }
 
@@ -77,7 +77,7 @@ public class MetricsEndpoint
     if (pDeviceID == null || pDeviceID.isBlank() || pMetricType == null || pMetricType.isBlank())
       throw new BadRequestException();
 
-    if (!metricRepository.deleteMetric(pDeviceID, pMetricType))
+    if (!metricRepository.delete(pDeviceID, pMetricType))
       throw new NotFoundException();
   }
 

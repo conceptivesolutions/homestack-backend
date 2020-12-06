@@ -2,7 +2,7 @@ package io.conceptive.homestack.backend.endpoints;
 
 import io.conceptive.homestack.backend.rbac.IRole;
 import io.conceptive.homestack.model.data.StackDataModel;
-import io.conceptive.homestack.repository.api.IStackRepository;
+import io.conceptive.homestack.repository.api.user.IStackUserRepository;
 import org.apache.commons.lang3.ObjectUtils;
 import org.jetbrains.annotations.Nullable;
 
@@ -21,7 +21,7 @@ public class StackEndpoint
 {
 
   @Inject
-  protected IStackRepository stackRepository;
+  protected IStackUserRepository stackRepository;
 
   /**
    * Returns all available stacks

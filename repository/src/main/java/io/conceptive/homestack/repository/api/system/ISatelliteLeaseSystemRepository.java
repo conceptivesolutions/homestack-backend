@@ -10,7 +10,7 @@ import java.util.Set;
  *
  * @author w.glanzer, 29.11.2020
  */
-public interface ISatelliteLeaseRepository
+public interface ISatelliteLeaseSystemRepository
 {
 
   /**

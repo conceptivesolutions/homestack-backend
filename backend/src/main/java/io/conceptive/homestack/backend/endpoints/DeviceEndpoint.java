@@ -2,8 +2,7 @@ package io.conceptive.homestack.backend.endpoints;
 
 import io.conceptive.homestack.backend.rbac.IRole;
 import io.conceptive.homestack.model.data.DeviceDataModel;
-import io.conceptive.homestack.repository.api.IDeviceRepository;
-import org.apache.commons.lang3.ObjectUtils;
+import io.conceptive.homestack.repository.api.user.IDeviceUserRepository;
 import org.jetbrains.annotations.Nullable;
 
 import javax.annotation.security.RolesAllowed;
@@ -23,7 +22,7 @@ public class DeviceEndpoint
 {
 
   @Inject
-  protected IDeviceRepository deviceRepository;
+  protected IDeviceUserRepository deviceRepository;
 
   /**
    * Returns all available devices
@@ -62,7 +61,7 @@ public class DeviceEndpoint
   }
 
   /**
-   * Create a device in the repository
+   * Create / Updates a device in the repository
    *
    * @param pID     ID of the device to insert
    * @param pDevice Device
@@ -82,12 +81,12 @@ public class DeviceEndpoint
     pDevice.id = pID;
 
     // insert
-    deviceRepository.insert(pDevice);
+    deviceRepository.upsert(pDevice);
     return pDevice;
   }
 
   /**
-   * Update a device in the repository
+   * Update a device partially in the repository
    *
    * @param pID     ID of the device to update
    * @param pDevice Device
@@ -100,17 +99,14 @@ public class DeviceEndpoint
     if (pID == null || pID.isBlank() || pDevice == null)
       throw new BadRequestException();
 
-    DeviceDataModel device = deviceRepository.findByID(pID);
-    if (device == null)
-      throw new NotFoundException();
+    if (pDevice.stackID == null || pDevice.stackID.isBlank())
+      throw new BadRequestException("stackID has to be specified");
 
-    // Update Data
-    device.address = ObjectUtils.firstNonNull(pDevice.address, device.address);
-    device.location = ObjectUtils.firstNonNull(pDevice.location, device.location);
-    device.stackID = ObjectUtils.firstNonNull(pDevice.stackID, device.stackID);
-    device.icon = ObjectUtils.firstNonNull(pDevice.icon, device.icon);
-    deviceRepository.update(device);
-    return device;
+    // force ID to be set and "correct"
+    pDevice.id = pID;
+
+    deviceRepository.upsert(pDevice);
+    return pDevice;
   }
 
   /**

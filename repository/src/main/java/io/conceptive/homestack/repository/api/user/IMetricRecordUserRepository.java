@@ -1,4 +1,4 @@
-package io.conceptive.homestack.repository.api;
+package io.conceptive.homestack.repository.api.user;
 
 import io.conceptive.homestack.model.data.MetricRecordDataModel;
 import org.jetbrains.annotations.*;
@@ -8,7 +8,7 @@ import java.util.Set;
 /**
  * @author w.glanzer, 12.10.2020
  */
-public interface IMetricRecordRepository
+public interface IMetricRecordUserRepository
 {
 
   /**
@@ -29,19 +29,5 @@ public interface IMetricRecordRepository
    */
   @Nullable
   MetricRecordDataModel findByType(@NotNull String pDeviceID, @NotNull String pType);
-
-  /**
-   * Contains all methods for tokenless access to the metrics repository
-   */
-  interface ITokenlessRepository
-  {
-    /**
-     * Adds a new metric record to the database
-     *
-     * @param pUserID       ID of the user, that owns the device of the metric record
-     * @param pMetricRecord Record to insert
-     */
-    void addMetricRecord(@NotNull String pUserID, @NotNull MetricRecordDataModel pMetricRecord);
-  }
 
 }

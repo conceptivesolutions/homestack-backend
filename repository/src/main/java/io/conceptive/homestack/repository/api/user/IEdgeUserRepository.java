@@ -1,4 +1,4 @@
-package io.conceptive.homestack.repository.api;
+package io.conceptive.homestack.repository.api.user;
 
 import io.conceptive.homestack.model.data.EdgeDataModel;
 import org.jetbrains.annotations.NotNull;
@@ -8,7 +8,7 @@ import java.util.Set;
 /**
  * @author w.glanzer, 12.10.2020
  */
-public interface IEdgeRepository
+public interface IEdgeUserRepository
 {
 
   /**

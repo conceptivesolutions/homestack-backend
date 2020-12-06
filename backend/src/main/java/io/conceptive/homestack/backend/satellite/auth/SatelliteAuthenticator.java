@@ -1,7 +1,7 @@
 package io.conceptive.homestack.backend.satellite.auth;
 
 import io.conceptive.homestack.model.data.satellite.SatelliteLeaseDataModel;
-import io.conceptive.homestack.repository.api.system.ISatelliteLeaseRepository;
+import io.conceptive.homestack.repository.api.system.ISatelliteLeaseSystemRepository;
 import io.quarkus.security.AuthenticationFailedException;
 import org.jetbrains.annotations.NotNull;
 
@@ -18,7 +18,7 @@ class SatelliteAuthenticator implements ISatelliteAuthenticator
 {
 
   @Inject
-  protected ISatelliteLeaseRepository satelliteLeaseRepository;
+  protected ISatelliteLeaseSystemRepository satelliteLeaseRepository;
 
   @NotNull
   @Override

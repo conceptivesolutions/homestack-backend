@@ -1,45 +1,40 @@
-package io.conceptive.homestack.repository.impl;
+package io.conceptive.homestack.repository.impl.system;
 
 import com.google.common.collect.Sets;
-import com.mongodb.client.*;
 import com.mongodb.client.model.Filters;
 import io.conceptive.homestack.model.data.satellite.SatelliteLeaseDataModel;
-import io.conceptive.homestack.repository.api.system.ISatelliteLeaseRepository;
+import io.conceptive.homestack.repository.api.system.ISatelliteLeaseSystemRepository;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.jetbrains.annotations.*;
 
 import javax.enterprise.context.ApplicationScoped;
-import javax.inject.Inject;
 import java.util.Set;
 
 /**
  * @author w.glanzer, 29.11.2020
  */
 @ApplicationScoped
-class SatelliteLeaseRepositoryImpl implements ISatelliteLeaseRepository
+class SatelliteLeaseSystemRepositoryImpl extends AbstractSystemRepository<SatelliteLeaseDataModel> implements ISatelliteLeaseSystemRepository
 {
-
-  @Inject
-  protected MongoClient mongoClient;
 
   @NotNull
   @Override
   public Set<SatelliteLeaseDataModel> findAll(@NotNull String pUserID)
   {
-    return Sets.newHashSet(_getCollection().find(Filters.eq("userID", pUserID)));
+    return Sets.newHashSet(getCollection().find(Filters.eq("userID", pUserID)));
   }
 
   @Nullable
   @Override
   public SatelliteLeaseDataModel findByID(@NotNull String pLeaseID)
   {
-    return _getCollection().find(Filters.eq("_id", pLeaseID)).first();
+    return getCollection().find(Filters.eq("_id", pLeaseID)).first();
   }
 
   @Override
   public void upsertLease(@NotNull SatelliteLeaseDataModel pLease)
   {
-    _getCollection().replaceOne(Filters.eq("_id", pLease.id), pLease, AbstractRepository.UPSERT);
+    getCollection().replaceOne(Filters.eq("_id", pLease.id), pLease, UPSERT);
   }
 
   @NotNull
@@ -49,8 +44,8 @@ class SatelliteLeaseRepositoryImpl implements ISatelliteLeaseRepository
     SatelliteLeaseDataModel lease = new SatelliteLeaseDataModel();
     lease.userID = pUserID;
     lease.satelliteID = pSatelliteID;
-    lease.id = RandomStringUtils.randomAlphanumeric(64);
-    lease.token = RandomStringUtils.randomAlphanumeric(32);
+    lease.id = RandomStringUtils.randomAlphanumeric(32);
+    lease.token = RandomStringUtils.randomAlphanumeric(192);
     upsertLease(lease);
     return lease;
   }
@@ -58,14 +53,14 @@ class SatelliteLeaseRepositoryImpl implements ISatelliteLeaseRepository
   @Override
   public void deleteBySatelliteID(@NotNull String pUserID, @NotNull String pSatelliteID)
   {
-    _getCollection().deleteMany(Filters.and(Filters.eq("userID", pUserID), Filters.eq("satelliteID", pSatelliteID)));
+    getCollection().deleteMany(Filters.and(Filters.eq("userID", pUserID), Filters.eq("satelliteID", pSatelliteID)));
   }
 
   @NotNull
-  private MongoCollection<SatelliteLeaseDataModel> _getCollection()
+  @Override
+  protected Class<SatelliteLeaseDataModel> getCollectionType()
   {
-    return mongoClient.getDatabase("_____SYSTEM")
-        .getCollection("satellite_leases", SatelliteLeaseDataModel.class);
+    return SatelliteLeaseDataModel.class;
   }
 
 }

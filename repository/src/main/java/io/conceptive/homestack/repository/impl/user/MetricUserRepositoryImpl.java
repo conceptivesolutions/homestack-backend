@@ -1,9 +1,9 @@
-package io.conceptive.homestack.repository.impl;
+package io.conceptive.homestack.repository.impl.user;
 
 import com.google.common.collect.Sets;
 import com.mongodb.client.model.Filters;
 import io.conceptive.homestack.model.data.MetricDataModel;
-import io.conceptive.homestack.repository.api.IMetricRepository;
+import io.conceptive.homestack.repository.api.user.IMetricUserRepository;
 import org.jetbrains.annotations.NotNull;
 
 import javax.enterprise.context.Dependent;
@@ -13,7 +13,7 @@ import java.util.Set;
  * @author w.glanzer, 02.11.2020
  */
 @Dependent
-class MetricRepositoryImpl extends AbstractRepository<MetricDataModel> implements IMetricRepository, IMetricRepository.ITokenlessRepository
+class MetricUserRepositoryImpl extends AbstractUserRepository<MetricDataModel> implements IMetricUserRepository
 {
   @NotNull
   @Override
@@ -24,28 +24,21 @@ class MetricRepositoryImpl extends AbstractRepository<MetricDataModel> implement
 
   @NotNull
   @Override
-  public Set<MetricDataModel> findAll(@NotNull String pDeviceID)
+  public Set<MetricDataModel> findAllByDeviceID(@NotNull String pDeviceID)
   {
     return Sets.newHashSet(getCollection().find(Filters.eq("deviceID", pDeviceID)));
   }
 
   @Override
-  public void insertMetric(@NotNull MetricDataModel pMetric)
+  public void upsert(@NotNull MetricDataModel pMetric)
   {
     getCollection().replaceOne(Filters.and(Filters.eq("type", pMetric.type), Filters.eq("deviceID", pMetric.deviceID)), pMetric, UPSERT);
   }
 
   @Override
-  public boolean deleteMetric(@NotNull String pDeviceID, @NotNull String pType)
+  public boolean delete(@NotNull String pDeviceID, @NotNull String pType)
   {
     return getCollection().deleteMany(Filters.and(Filters.eq("type", pType), Filters.eq("deviceID", pDeviceID))).getDeletedCount() > 0;
-  }
-
-  @NotNull
-  @Override
-  public Set<MetricDataModel> findAll(@NotNull String pUserID, @NotNull String pDeviceID)
-  {
-    return Sets.newHashSet(getCollectionForUser(pUserID).find(Filters.eq("deviceID", pDeviceID)));
   }
 
   @NotNull

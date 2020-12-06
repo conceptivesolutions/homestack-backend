@@ -2,7 +2,8 @@ package io.conceptive.homestack.backend.endpoints.satellite;
 
 import io.conceptive.homestack.backend.rbac.IRole;
 import io.conceptive.homestack.model.data.satellite.SatelliteDataModel;
-import io.conceptive.homestack.repository.api.system.*;
+import io.conceptive.homestack.repository.api.system.ISatelliteLeaseSystemRepository;
+import io.conceptive.homestack.repository.api.user.ISatelliteUserRepository;
 import org.eclipse.microprofile.jwt.JsonWebToken;
 import org.jetbrains.annotations.Nullable;
 
@@ -26,10 +27,10 @@ public class SatelliteEndpoint
   protected JsonWebToken token;
 
   @Inject
-  protected ISatelliteRepository satelliteRepository;
+  protected ISatelliteUserRepository satelliteRepository;
 
   @Inject
-  protected ISatelliteLeaseRepository satelliteLeaseRepository;
+  protected ISatelliteLeaseSystemRepository satelliteLeaseRepository;
 
   /**
    * Returns all currently known satellites for the user
@@ -102,7 +103,7 @@ public class SatelliteEndpoint
     // delete leases anyway
     satelliteLeaseRepository.deleteBySatelliteID(token.getSubject(), pID);
 
-    boolean deleted = satelliteRepository.delete(pID);
+    boolean deleted = satelliteRepository.deleteByID(pID);
     if (!deleted)
       throw new NotFoundException();
   }

@@ -2,7 +2,7 @@ package io.conceptive.homestack.backend.endpoints.satellite;
 
 import io.conceptive.homestack.backend.rbac.IRole;
 import io.conceptive.homestack.model.data.satellite.SatelliteLeaseDataModel;
-import io.conceptive.homestack.repository.api.system.ISatelliteLeaseRepository;
+import io.conceptive.homestack.repository.api.system.ISatelliteLeaseSystemRepository;
 import org.eclipse.microprofile.jwt.JsonWebToken;
 import org.jetbrains.annotations.NotNull;
 
@@ -28,7 +28,7 @@ public class SatelliteLeasesEndpoint
   protected JsonWebToken token;
 
   @Inject
-  protected ISatelliteLeaseRepository satelliteLeaseRepository;
+  protected ISatelliteLeaseSystemRepository satelliteLeaseRepository;
 
   /**
    * Returns all currently known leases for this satellite,

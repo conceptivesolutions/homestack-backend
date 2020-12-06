@@ -1,8 +1,8 @@
-package io.conceptive.homestack.repository.impl;
+package io.conceptive.homestack.repository.impl.user;
 
 import com.mongodb.client.model.*;
 import io.conceptive.homestack.model.data.MetricRecordDataModel;
-import io.conceptive.homestack.repository.api.IMetricRecordRepository;
+import io.conceptive.homestack.repository.api.user.IMetricRecordUserRepository;
 import org.jetbrains.annotations.*;
 
 import javax.enterprise.context.Dependent;
@@ -13,7 +13,7 @@ import java.util.stream.*;
  * @author w.glanzer, 12.10.2020
  */
 @Dependent
-class MetricRecordRepositoryImpl extends AbstractRepository<MetricRecordDataModel> implements IMetricRecordRepository, IMetricRecordRepository.ITokenlessRepository
+class MetricRecordUserRepositoryImpl extends AbstractUserRepository<MetricRecordDataModel> implements IMetricRecordUserRepository
 {
 
   private static final String _RECORDCOLLECTION_PREFIX = "records_";
@@ -44,14 +44,6 @@ class MetricRecordRepositoryImpl extends AbstractRepository<MetricRecordDataMode
         .find(Filters.eq("deviceID", pDeviceID))
         .sort(Sorts.descending("recordTime"))
         .first();
-  }
-
-  @Override
-  public void addMetricRecord(@NotNull String pUserID, @NotNull MetricRecordDataModel pMetricRecord)
-  {
-    mongoClient.getDatabase(pUserID)
-        .getCollection(_RECORDCOLLECTION_PREFIX + pMetricRecord.type, getCollectionType())
-        .insertOne(pMetricRecord);
   }
 
   @NotNull

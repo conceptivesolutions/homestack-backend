@@ -1,9 +1,9 @@
-package io.conceptive.homestack.repository.impl;
+package io.conceptive.homestack.repository.impl.user;
 
 import com.google.common.collect.Sets;
 import com.mongodb.client.model.Filters;
 import io.conceptive.homestack.model.data.EdgeDataModel;
-import io.conceptive.homestack.repository.api.IEdgeRepository;
+import io.conceptive.homestack.repository.api.user.IEdgeUserRepository;
 import org.bson.conversions.Bson;
 import org.jetbrains.annotations.NotNull;
 
@@ -14,7 +14,7 @@ import java.util.*;
  * @author w.glanzer, 12.10.2020
  */
 @Dependent
-class EdgeRepositoryImpl extends AbstractRepository<EdgeDataModel> implements IEdgeRepository
+class EdgeUserRepositoryImpl extends AbstractUserRepository<EdgeDataModel> implements IEdgeUserRepository
 {
 
   @NotNull

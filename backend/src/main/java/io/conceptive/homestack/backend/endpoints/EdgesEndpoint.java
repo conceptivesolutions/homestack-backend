@@ -2,7 +2,7 @@ package io.conceptive.homestack.backend.endpoints;
 
 import io.conceptive.homestack.backend.rbac.IRole;
 import io.conceptive.homestack.model.data.EdgeDataModel;
-import io.conceptive.homestack.repository.api.IEdgeRepository;
+import io.conceptive.homestack.repository.api.user.IEdgeUserRepository;
 import org.jetbrains.annotations.Nullable;
 
 import javax.annotation.security.RolesAllowed;
@@ -20,7 +20,7 @@ public class EdgesEndpoint
 {
 
   @Inject
-  protected IEdgeRepository edgeRepository;
+  protected IEdgeUserRepository edgeRepository;
 
   /**
    * Returns all edges of a given device
