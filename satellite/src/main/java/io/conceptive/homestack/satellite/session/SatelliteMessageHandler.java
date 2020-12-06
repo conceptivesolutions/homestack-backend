@@ -46,10 +46,16 @@ class SatelliteMessageHandler implements MessageHandler.Whole<WebsocketEvent>
     if (pEvent == null)
       return;
 
+    Object userID = session.getUserProperties().get(_SESSIONKEY_USER_ID);
+    Object authorized = session.getUserProperties().get(_SESSIONKEY_AUTHORIZED);
+
     // Determine, if authorized
-    if (Boolean.TRUE.equals(session.getUserProperties().get(_SESSIONKEY_AUTHORIZED)) &&
-        session.getUserProperties().get(_SESSIONKEY_USER_ID) != null)
-      _handleEventAuthorized(pEvent);
+    if (Boolean.TRUE.equals(authorized) && userID != null)
+    {
+      // First handle it authorized - if not handled, try with "unauthorized" events
+      if (!_handleEventAuthorized((String) userID, pEvent))
+        _handleEventUnauthorized(pEvent);
+    }
     else
       _handleEventUnauthorized(pEvent);
   }
@@ -101,24 +107,24 @@ class SatelliteMessageHandler implements MessageHandler.Whole<WebsocketEvent>
   /**
    * Gets called, if an event happened and the session is already authenticated
    *
-   * @param pEvent event that happened
+   * @param pUserID ID of the authorized user
+   * @param pEvent  event that happened
+   * @return true, if event was handled
    */
-  private void _handleEventAuthorized(@NotNull WebsocketEvent<?> pEvent)
+  private boolean _handleEventAuthorized(@NotNull String pUserID, @NotNull WebsocketEvent<?> pEvent)
   {
-    String userID = (String) session.getUserProperties().get(_SESSIONKEY_USER_ID);
-    if (userID != null && !userID.isBlank())
+    if (pEvent.equalType(SatelliteWebSocketEvents.RECORDS))
     {
-      if (pEvent.equalType(SatelliteWebSocketEvents.RECORDS))
-      {
-        Set<MetricRecordDataModel> records = SatelliteWebSocketEvents.RECORDS.payloadOf(pEvent).records;
-        if (records != null && !records.isEmpty())
-          metricRecordSystemRepository.insert(userID, records.toArray(new MetricRecordDataModel[0]));
-      }
-      else
-        Logger.getLogger(SatelliteMessageHandler.class).warn(pEvent + " was not handled, because no handler was registered for it");
+      Set<MetricRecordDataModel> records = SatelliteWebSocketEvents.RECORDS.payloadOf(pEvent).records;
+      if (records != null && !records.isEmpty())
+        metricRecordSystemRepository.insert(pUserID, records.toArray(new MetricRecordDataModel[0]));
+      return true;
     }
     else
-      Logger.getLogger(SatelliteMessageHandler.class).warn(pEvent + " was not handled, because user id is not defined in current session");
+    {
+      Logger.getLogger(SatelliteMessageHandler.class).warn(pEvent + " was not handled, because no handler was registered for it");
+      return false;
+    }
   }
 
   /**
