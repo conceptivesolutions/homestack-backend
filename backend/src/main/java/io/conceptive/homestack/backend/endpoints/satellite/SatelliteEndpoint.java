@@ -38,11 +38,9 @@ public class SatelliteEndpoint
   @GET
   @Path("/")
   @Produces(MediaType.APPLICATION_JSON)
-  public Set<SatelliteDataModel> get(@QueryParam("stack") @Nullable String pStackID)
+  public Set<SatelliteDataModel> get()
   {
-    if (pStackID == null || pStackID.isBlank())
-      return satelliteRepository.findAll();
-    return satelliteRepository.findByStackID(pStackID);
+    return satelliteRepository.findAll();
   }
 
   /**

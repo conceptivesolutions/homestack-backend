@@ -1,9 +1,9 @@
 package io.conceptive.homestack.backend.endpoints;
 
 import io.conceptive.homestack.backend.rbac.IRole;
-import io.conceptive.homestack.model.data.StackDataModel;
-import io.conceptive.homestack.repository.api.user.IStackUserRepository;
-import org.apache.commons.lang3.ObjectUtils;
+import io.conceptive.homestack.model.data.*;
+import io.conceptive.homestack.model.data.satellite.SatelliteDataModel;
+import io.conceptive.homestack.repository.api.user.*;
 import org.jetbrains.annotations.Nullable;
 
 import javax.annotation.security.RolesAllowed;
@@ -21,7 +21,13 @@ public class StackEndpoint
 {
 
   @Inject
-  protected IStackUserRepository stackRepository;
+  protected IStackUserRepository stackUserRepository;
+
+  @Inject
+  protected ISatelliteUserRepository satelliteUserRepository;
+
+  @Inject
+  protected IDeviceUserRepository deviceUserRepository;
 
   /**
    * Returns all available stacks
@@ -31,7 +37,7 @@ public class StackEndpoint
   @Produces(MediaType.APPLICATION_JSON)
   public Set<StackDataModel> get()
   {
-    return stackRepository.findAll();
+    return stackUserRepository.findAll();
   }
 
   /**
@@ -47,11 +53,41 @@ public class StackEndpoint
     if (pID == null || pID.isBlank())
       throw new BadRequestException();
 
-    StackDataModel stack = stackRepository.findByID(pID);
+    StackDataModel stack = stackUserRepository.findByID(pID);
     if (stack == null)
       throw new NotFoundException();
 
     return stack;
+  }
+
+  /**
+   * Returns all available satellites in this stack
+   */
+  @GET
+  @Path("/{id}/satellites")
+  @Produces(MediaType.APPLICATION_JSON)
+  public Set<SatelliteDataModel> getSatellites(@PathParam("id") String pID)
+  {
+    if (pID == null || pID.isBlank())
+      throw new BadRequestException();
+
+    return satelliteUserRepository.findByStackID(pID);
+  }
+
+  /**
+   * Returns all available devices in this stack
+   *
+   * @return the devices
+   */
+  @GET
+  @Path("/{id}/devices")
+  @Produces(MediaType.APPLICATION_JSON)
+  public Set<DeviceDataModel> getDevices(@PathParam("id") String pID)
+  {
+    if (pID == null || pID.isBlank())
+      throw new BadRequestException();
+
+    return deviceUserRepository.findByStackID(pID);
   }
 
   /**
@@ -72,32 +108,8 @@ public class StackEndpoint
     pStack.id = pID;
 
     // insert
-    stackRepository.insert(pStack);
+    stackUserRepository.upsert(pStack);
     return pStack;
-  }
-
-  /**
-   * Update a stack in the repository
-   *
-   * @param pID    ID of the device to update
-   * @param pStack Stack
-   */
-  @PATCH
-  @Path("/{id}")
-  @Produces(MediaType.APPLICATION_JSON)
-  public StackDataModel patch(@PathParam("id") String pID, @Nullable StackDataModel pStack)
-  {
-    if (pID == null || pID.isBlank() || pStack == null)
-      throw new BadRequestException();
-
-    StackDataModel stack = stackRepository.findByID(pStack.id);
-    if (stack == null)
-      throw new NotFoundException();
-
-    // Update Data
-    stack.displayName = ObjectUtils.firstNonNull(pStack.displayName, stack.displayName);
-    stackRepository.update(stack);
-    return stack;
   }
 
   /**
@@ -113,7 +125,7 @@ public class StackEndpoint
     if (pID == null || pID.isBlank())
       throw new BadRequestException();
 
-    boolean deleted = stackRepository.deleteByID(pID);
+    boolean deleted = stackUserRepository.deleteByID(pID);
     if (!deleted)
       throw new NotFoundException();
   }
