@@ -1,16 +1,15 @@
 package io.conceptive.homestack.satellite.session;
 
-import io.conceptive.homestack.model.data.*;
-import io.conceptive.homestack.model.satellite.SatelliteConfigurationDataModel;
+import io.conceptive.homestack.model.data.satellite.SatelliteLeaseDataModel;
 import io.conceptive.homestack.model.satellite.events.SatelliteWebSocketEvents;
 import io.conceptive.homestack.model.satellite.events.data.AuthenticateEventData;
 import io.conceptive.homestack.model.websocket.WebsocketEvent;
 import io.conceptive.homestack.satellite.auth.ISatelliteAuthenticator;
+import io.conceptive.homestack.satellite.config.ISatelliteConfigFactory;
 import org.jboss.logging.Logger;
 import org.jetbrains.annotations.*;
 
 import javax.websocket.*;
-import java.util.Set;
 
 /**
  * Handles all websocket events
@@ -24,11 +23,13 @@ class SatelliteMessageHandler implements MessageHandler.Whole<WebsocketEvent>
   private static final String _SESSIONKEY_SATELLITE_ID = "id";
   private static final String _SESSIONKEY_SATELLITE_VERSION = "version";
   private final ISatelliteAuthenticator authenticator;
+  private final ISatelliteConfigFactory configFactory;
   private final Session session;
 
-  public SatelliteMessageHandler(@NotNull ISatelliteAuthenticator pAuthenticator, @NotNull Session pSession)
+  public SatelliteMessageHandler(@NotNull ISatelliteAuthenticator pAuthenticator, @NotNull ISatelliteConfigFactory pConfigFactory, @NotNull Session pSession)
   {
     authenticator = pAuthenticator;
+    configFactory = pConfigFactory;
     session = pSession;
   }
 
@@ -67,7 +68,8 @@ class SatelliteMessageHandler implements MessageHandler.Whole<WebsocketEvent>
           return;
 
         // Authenticate (throws Exception, if invalid) and get satellite id
-        satelliteID = authenticator.authenticate(data.leaseID, data.leaseToken);
+        SatelliteLeaseDataModel lease = authenticator.authenticate(data.leaseID, data.leaseToken);
+        satelliteID = lease.satelliteID;
 
         // set information to session because we know, that we are now authenticated - because of JWT decoded sucessfully
         session.getUserProperties().put(_SESSIONKEY_AUTHORIZED, true);
@@ -75,7 +77,7 @@ class SatelliteMessageHandler implements MessageHandler.Whole<WebsocketEvent>
         session.getUserProperties().put(_SESSIONKEY_SATELLITE_VERSION, version);
 
         // answer with (initial) config
-        session.getAsyncRemote().sendObject(SatelliteWebSocketEvents.CONFIG.payload(_createConfig()));
+        session.getAsyncRemote().sendObject(SatelliteWebSocketEvents.CONFIG.payload(configFactory.create(lease.userID, satelliteID)));
       }
       catch (Exception e)
       {
@@ -111,26 +113,6 @@ class SatelliteMessageHandler implements MessageHandler.Whole<WebsocketEvent>
     {
       // should not happen - the session is already closed
     }
-  }
-
-  /**
-   * @return
-   */
-  @NotNull
-  private SatelliteConfigurationDataModel _createConfig()
-  {
-    // todo
-    SatelliteConfigurationDataModel model = new SatelliteConfigurationDataModel();
-    DeviceDataModel devModel = new DeviceDataModel();
-    devModel.id = "newDev";
-    devModel.address = "127.0.0.1";
-    model.devices = Set.of(devModel);
-    MetricDataModel metric = new MetricDataModel();
-    metric.type = "ping";
-    metric.deviceID = "newDev";
-    metric.enabled = true;
-    model.metrics = Set.of(metric);
-    return model;
   }
 
 }

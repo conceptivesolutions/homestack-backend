@@ -22,7 +22,7 @@ class SatelliteAuthenticator implements ISatelliteAuthenticator
 
   @NotNull
   @Override
-  public String authenticate(@NotNull String pLeaseID, @NotNull String pLeaseToken) throws AuthenticationFailedException
+  public SatelliteLeaseDataModel authenticate(@NotNull String pLeaseID, @NotNull String pLeaseToken) throws AuthenticationFailedException
   {
     SatelliteLeaseDataModel lease = satelliteLeaseRepository.findByID(pLeaseID);
 
@@ -38,7 +38,7 @@ class SatelliteAuthenticator implements ISatelliteAuthenticator
     if (!Objects.equals(lease.token, pLeaseToken))
       throw new AuthenticationFailedException("Valid lease found, but tokens do not match (" + pLeaseID + ")");
 
-    return lease.satelliteID;
+    return lease;
   }
 
 }

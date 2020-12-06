@@ -1,10 +1,11 @@
 <component name="ProjectRunConfigurationManager">
   <configuration default="false" name="Backend" type="QuarkusMavenBridge">
+    <option name="compileBeforeLaunch" value="false" />
     <option name="jreName" value="11" />
     <option name="vmOptions" value="-Ddb.user=homestackdev -Ddb.password=homestackdev -Ddb.host=loku-worker-1.home.lan -Ddb.port=31825" />
     <option name="workingDir" value="$PROJECT_DIR$/backend" />
     <method v="2">
-      <option name="Maven.BeforeRunTask" enabled="true" file="$PROJECT_DIR$/repository/pom.xml" goal="clean install" />
+      <option name="Maven.BeforeRunTask" enabled="true" file="$PROJECT_DIR$//pom.xml" goal="clean install" />
     </method>
   </configuration>
 </component>

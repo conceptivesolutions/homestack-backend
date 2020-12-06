@@ -2,6 +2,7 @@ package io.conceptive.homestack.satellite.session;
 
 import io.conceptive.homestack.model.websocket.WebsocketEvent;
 import io.conceptive.homestack.satellite.auth.ISatelliteAuthenticator;
+import io.conceptive.homestack.satellite.config.ISatelliteConfigFactory;
 import org.jetbrains.annotations.NotNull;
 
 import javax.enterprise.context.ApplicationScoped;
@@ -18,10 +19,13 @@ class SatelliteSessionManagerImpl implements ISatelliteSessionManager
   @Inject
   protected ISatelliteAuthenticator authenticator;
 
+  @Inject
+  protected ISatelliteConfigFactory configFactory;
+
   @Override
   public void registerSession(@NotNull Session pSession)
   {
-    pSession.addMessageHandler(WebsocketEvent.class, new SatelliteMessageHandler(authenticator, pSession));
+    pSession.addMessageHandler(WebsocketEvent.class, new SatelliteMessageHandler(authenticator, configFactory, pSession));
   }
 
   @Override
