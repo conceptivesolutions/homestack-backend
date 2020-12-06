@@ -26,7 +26,7 @@ class EdgeRepositoryImpl extends AbstractRepository<EdgeDataModel> implements IE
 
   @NotNull
   @Override
-  public EdgeDataModel addEdge(@NotNull String pSourceID, @NotNull String pTargetID)
+  public EdgeDataModel insert(@NotNull String pSourceID, @NotNull String pTargetID)
   {
     Bson filter1 = Filters.and(Filters.eq("sourceID", pSourceID), Filters.eq("targetID", pTargetID));
     Bson filter2 = Filters.and(Filters.eq("sourceID", pTargetID), Filters.eq("targetID", pSourceID));
@@ -47,7 +47,7 @@ class EdgeRepositoryImpl extends AbstractRepository<EdgeDataModel> implements IE
   }
 
   @Override
-  public boolean removeEdge(@NotNull String pSourceID, @NotNull String pTargetID)
+  public boolean delete(@NotNull String pSourceID, @NotNull String pTargetID)
   {
     Bson filter1 = Filters.and(Filters.eq("sourceID", pSourceID), Filters.eq("targetID", pTargetID));
     Bson filter2 = Filters.and(Filters.eq("sourceID", pTargetID), Filters.eq("targetID", pSourceID));

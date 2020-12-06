@@ -1,8 +1,8 @@
 package io.conceptive.homestack.backend.endpoints;
 
 import io.conceptive.homestack.backend.rbac.IRole;
-import io.conceptive.homestack.model.data.HostDataModel;
-import io.conceptive.homestack.repository.api.IHostRepository;
+import io.conceptive.homestack.model.data.StackDataModel;
+import io.conceptive.homestack.repository.api.IStackRepository;
 import org.apache.commons.lang3.ObjectUtils;
 import org.jetbrains.annotations.Nullable;
 
@@ -15,93 +15,93 @@ import java.util.Set;
 /**
  * @author w.glanzer, 16.10.2020
  */
-@Path("/hosts")
+@Path("/stacks")
 @RolesAllowed(IRole.DEFAULT)
-public class HostEndpoint
+public class StackEndpoint
 {
 
   @Inject
-  protected IHostRepository hostRepository;
+  protected IStackRepository stackRepository;
 
   /**
-   * Returns all available hosts
+   * Returns all available stacks
    */
   @GET
   @Path("/")
   @Produces(MediaType.APPLICATION_JSON)
-  public Set<HostDataModel> get()
+  public Set<StackDataModel> get()
   {
-    return hostRepository.findAll();
+    return stackRepository.findAll();
   }
 
   /**
-   * Searches the host with the given id
+   * Searches the stack with the given id
    *
    * @param pID ID to search for
    */
   @GET
   @Path("/{id}")
   @Produces(MediaType.APPLICATION_JSON)
-  public HostDataModel getByID(@PathParam("id") String pID)
+  public StackDataModel getByID(@PathParam("id") String pID)
   {
     if (pID == null || pID.isBlank())
       throw new BadRequestException();
 
-    HostDataModel host = hostRepository.findHostByID(pID);
-    if (host == null)
+    StackDataModel stack = stackRepository.findByID(pID);
+    if (stack == null)
       throw new NotFoundException();
 
-    return host;
+    return stack;
   }
 
   /**
-   * Creates a new host in the repository
+   * Creates a new stack in the repository
    *
-   * @param pID   ID of the host to insert
-   * @param pHost Host
+   * @param pID    ID of the stack to insert
+   * @param pStack Stack
    */
   @PUT
   @Path("/{id}")
   @Produces(MediaType.APPLICATION_JSON)
-  public HostDataModel put(@PathParam("id") String pID, @Nullable HostDataModel pHost)
+  public StackDataModel put(@PathParam("id") String pID, @Nullable StackDataModel pStack)
   {
-    if (pID == null || pID.isBlank() || pHost == null)
+    if (pID == null || pID.isBlank() || pStack == null)
       throw new BadRequestException();
 
     // force IDs to be set and "correct"
-    pHost.id = pID;
+    pStack.id = pID;
 
     // insert
-    hostRepository.insertHost(pHost);
-    return pHost;
+    stackRepository.insert(pStack);
+    return pStack;
   }
 
   /**
-   * Update a host in the repository
+   * Update a stack in the repository
    *
-   * @param pID   ID of the device to update
-   * @param pHost Host
+   * @param pID    ID of the device to update
+   * @param pStack Stack
    */
   @PATCH
   @Path("/{id}")
   @Produces(MediaType.APPLICATION_JSON)
-  public HostDataModel patch(@PathParam("id") String pID, @Nullable HostDataModel pHost)
+  public StackDataModel patch(@PathParam("id") String pID, @Nullable StackDataModel pStack)
   {
-    if (pID == null || pID.isBlank() || pHost == null)
+    if (pID == null || pID.isBlank() || pStack == null)
       throw new BadRequestException();
 
-    HostDataModel host = hostRepository.findHostByID(pHost.id);
-    if (host == null)
+    StackDataModel stack = stackRepository.findByID(pStack.id);
+    if (stack == null)
       throw new NotFoundException();
 
     // Update Data
-    host.displayName = ObjectUtils.firstNonNull(pHost.displayName, host.displayName);
-    hostRepository.updateHost(host);
-    return host;
+    stack.displayName = ObjectUtils.firstNonNull(pStack.displayName, stack.displayName);
+    stackRepository.update(stack);
+    return stack;
   }
 
   /**
-   * Deletes a host with the given id
+   * Deletes a stack with the given id
    *
    * @param pID ID to search for
    */
@@ -113,7 +113,7 @@ public class HostEndpoint
     if (pID == null || pID.isBlank())
       throw new BadRequestException();
 
-    boolean deleted = hostRepository.deleteHost(pID);
+    boolean deleted = stackRepository.deleteByID(pID);
     if (!deleted)
       throw new NotFoundException();
   }

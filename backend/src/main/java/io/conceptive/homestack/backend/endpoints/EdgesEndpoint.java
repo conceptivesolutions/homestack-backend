@@ -52,7 +52,7 @@ public class EdgesEndpoint
     if (pDeviceID == null || pDeviceID.isBlank() || pTargetDeviceID == null || pTargetDeviceID.isBlank())
       throw new BadRequestException();
 
-    return edgeRepository.addEdge(pDeviceID, pTargetDeviceID);
+    return edgeRepository.insert(pDeviceID, pTargetDeviceID);
   }
 
   /**
@@ -69,7 +69,7 @@ public class EdgesEndpoint
     if (pDeviceID == null || pDeviceID.isBlank() || pTargetID == null || pTargetID.isBlank())
       throw new BadRequestException();
 
-    if (!edgeRepository.removeEdge(pDeviceID, pTargetID))
+    if (!edgeRepository.delete(pDeviceID, pTargetID))
       throw new NotFoundException();
   }
 }

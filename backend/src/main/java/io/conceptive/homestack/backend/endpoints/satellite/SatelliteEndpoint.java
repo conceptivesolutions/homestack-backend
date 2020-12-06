@@ -37,11 +37,11 @@ public class SatelliteEndpoint
   @GET
   @Path("/")
   @Produces(MediaType.APPLICATION_JSON)
-  public Set<SatelliteDataModel> get(@QueryParam("host") @Nullable String pHostID)
+  public Set<SatelliteDataModel> get(@QueryParam("stack") @Nullable String pStackID)
   {
-    if (pHostID == null || pHostID.isBlank())
+    if (pStackID == null || pStackID.isBlank())
       return satelliteRepository.findAll();
-    return satelliteRepository.findByHostID(pHostID);
+    return satelliteRepository.findByStackID(pStackID);
   }
 
   /**

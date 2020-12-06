@@ -25,9 +25,9 @@ class SatelliteRepository extends AbstractRepository<SatelliteDataModel> impleme
 
   @NotNull
   @Override
-  public Set<SatelliteDataModel> findByHostID(@NotNull String pHostID)
+  public Set<SatelliteDataModel> findByStackID(@NotNull String pStackID)
   {
-    return Sets.newHashSet(getCollection().find(Filters.eq("hostID", pHostID)));
+    return Sets.newHashSet(getCollection().find(Filters.eq("stackID", pStackID)));
   }
 
   @Nullable

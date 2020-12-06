@@ -20,13 +20,13 @@ public interface IDeviceRepository
   Set<DeviceDataModel> findAll();
 
   /**
-   * Returns all currently known devices for a given host
+   * Returns all currently known devices for a given stack
    *
-   * @param pHostID ID of the host
+   * @param pStackID ID of the stack
    * @return all devices
    */
   @NotNull
-  Set<DeviceDataModel> findByHost(@NotNull String pHostID);
+  Set<DeviceDataModel> findByStackID(@NotNull String pStackID);
 
   /**
    * Tries to find the device by the given id
@@ -35,21 +35,21 @@ public interface IDeviceRepository
    * @return Device or NULL if not found
    */
   @Nullable
-  DeviceDataModel findDeviceById(@NotNull String pID);
+  DeviceDataModel findByID(@NotNull String pID);
 
   /**
    * Inserts a single device into the repository
    *
    * @param pDevice Device to insert
    */
-  void insertDevice(@NotNull DeviceDataModel pDevice);
+  void insert(@NotNull DeviceDataModel pDevice);
 
   /**
    * Update a single device from the repository
    *
    * @param pDevice Device to update
    */
-  void updateDevice(@NotNull DeviceDataModel pDevice);
+  void update(@NotNull DeviceDataModel pDevice);
 
   /**
    * Deletes the device (if any) specified by given id
@@ -57,7 +57,7 @@ public interface IDeviceRepository
    * @param pID ID of the device to be deleted
    * @return true, if device was deleted
    */
-  boolean deleteDeviceByID(@NotNull String pID);
+  boolean deleteByID(@NotNull String pID);
 
   /**
    * Contains all methods for tokenless access to the device repository

@@ -33,11 +33,11 @@ public class DeviceEndpoint
   @GET
   @Path("/")
   @Produces(MediaType.APPLICATION_JSON)
-  public Set<DeviceDataModel> get(@QueryParam("host") @Nullable String pHostID)
+  public Set<DeviceDataModel> get(@QueryParam("stack") @Nullable String pStackID)
   {
-    if (pHostID == null || pHostID.isBlank())
+    if (pStackID == null || pStackID.isBlank())
       return deviceRepository.findAll();
-    return deviceRepository.findByHost(pHostID);
+    return deviceRepository.findByStackID(pStackID);
   }
 
   /**
@@ -54,7 +54,7 @@ public class DeviceEndpoint
     if (pID == null || pID.isBlank())
       throw new BadRequestException();
 
-    DeviceDataModel device = deviceRepository.findDeviceById(pID);
+    DeviceDataModel device = deviceRepository.findByID(pID);
     if (device == null)
       throw new NotFoundException();
 
@@ -75,14 +75,14 @@ public class DeviceEndpoint
     if (pID == null || pID.isBlank() || pDevice == null)
       throw new BadRequestException();
 
-    if (pDevice.hostID == null || pDevice.hostID.isBlank())
-      throw new BadRequestException("hostID has to be specified");
+    if (pDevice.stackID == null || pDevice.stackID.isBlank())
+      throw new BadRequestException("stackID has to be specified");
 
     // force ID to be set and "correct"
     pDevice.id = pID;
 
     // insert
-    deviceRepository.insertDevice(pDevice);
+    deviceRepository.insert(pDevice);
     return pDevice;
   }
 
@@ -100,16 +100,16 @@ public class DeviceEndpoint
     if (pID == null || pID.isBlank() || pDevice == null)
       throw new BadRequestException();
 
-    DeviceDataModel device = deviceRepository.findDeviceById(pID);
+    DeviceDataModel device = deviceRepository.findByID(pID);
     if (device == null)
       throw new NotFoundException();
 
     // Update Data
     device.address = ObjectUtils.firstNonNull(pDevice.address, device.address);
     device.location = ObjectUtils.firstNonNull(pDevice.location, device.location);
-    device.hostID = ObjectUtils.firstNonNull(pDevice.hostID, device.hostID);
+    device.stackID = ObjectUtils.firstNonNull(pDevice.stackID, device.stackID);
     device.icon = ObjectUtils.firstNonNull(pDevice.icon, device.icon);
-    deviceRepository.updateDevice(device);
+    deviceRepository.update(device);
     return device;
   }
 
@@ -126,7 +126,7 @@ public class DeviceEndpoint
     if (pID == null || pID.isBlank())
       throw new BadRequestException();
 
-    boolean deleted = deviceRepository.deleteDeviceByID(pID);
+    boolean deleted = deviceRepository.deleteByID(pID);
     if (!deleted)
       throw new NotFoundException();
   }

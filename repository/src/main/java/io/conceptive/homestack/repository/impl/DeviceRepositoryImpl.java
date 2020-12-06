@@ -28,32 +28,32 @@ class DeviceRepositoryImpl extends AbstractRepository<DeviceDataModel> implement
 
   @NotNull
   @Override
-  public synchronized Set<DeviceDataModel> findByHost(@NotNull String pHostID)
+  public synchronized Set<DeviceDataModel> findByStackID(@NotNull String pStackID)
   {
-    return Sets.newHashSet(getCollection().find(Filters.eq("hostID", pHostID)));
+    return Sets.newHashSet(getCollection().find(Filters.eq("stackID", pStackID)));
   }
 
   @Nullable
   @Override
-  public synchronized DeviceDataModel findDeviceById(@NotNull String pID)
+  public synchronized DeviceDataModel findByID(@NotNull String pID)
   {
     return getCollection().find(Filters.eq("_id", pID), DeviceDataModel.class).first();
   }
 
   @Override
-  public synchronized void insertDevice(@NotNull DeviceDataModel pDevice)
+  public synchronized void insert(@NotNull DeviceDataModel pDevice)
   {
     getCollection().insertOne(pDevice);
   }
 
   @Override
-  public synchronized void updateDevice(@NotNull DeviceDataModel pDevice)
+  public synchronized void update(@NotNull DeviceDataModel pDevice)
   {
     getCollection().replaceOne(Filters.eq("_id", pDevice.id), pDevice, UPSERT);
   }
 
   @Override
-  public synchronized boolean deleteDeviceByID(@NotNull String pID)
+  public synchronized boolean deleteByID(@NotNull String pID)
   {
     return getCollection().deleteOne(new BasicDBObject("_id", pID)).getDeletedCount() > 0;
   }

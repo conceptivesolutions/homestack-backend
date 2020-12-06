@@ -20,13 +20,13 @@ public interface ISatelliteRepository
   Set<SatelliteDataModel> findAll();
 
   /**
-   * Returns all currently known satellites for the current user for the given host
+   * Returns all currently known satellites for the current user for the given stack
    *
-   * @param pHostID ID of the host
+   * @param pStackID ID of the stack
    * @return all satellites
    */
   @NotNull
-  Set<SatelliteDataModel> findByHostID(@NotNull String pHostID);
+  Set<SatelliteDataModel> findByStackID(@NotNull String pStackID);
 
   /**
    * Tries to find the satellite by the given id for the current user

@@ -28,7 +28,7 @@ public interface IEdgeRepository
    * @return Edge that was added
    */
   @NotNull
-  EdgeDataModel addEdge(@NotNull String pSourceID, @NotNull String pTargetID);
+  EdgeDataModel insert(@NotNull String pSourceID, @NotNull String pTargetID);
 
   /**
    * Removes the edge between pSourceID and pTargetID
@@ -37,6 +37,6 @@ public interface IEdgeRepository
    * @param pTargetID ID of the target device
    * @return true, if edge was removed - false, if it did not exist
    */
-  boolean removeEdge(@NotNull String pSourceID, @NotNull String pTargetID);
+  boolean delete(@NotNull String pSourceID, @NotNull String pTargetID);
 
 }
