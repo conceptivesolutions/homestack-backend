@@ -1,7 +1,7 @@
 package io.conceptive.homestack.satellite.session;
 
 import io.conceptive.homestack.model.websocket.WebsocketEvent;
-import io.conceptive.homestack.repository.api.system.IMetricRecordSystemRepository;
+import io.conceptive.homestack.repository.api.system.*;
 import io.conceptive.homestack.satellite.auth.ISatelliteAuthenticator;
 import io.conceptive.homestack.satellite.config.ISatelliteConfigFactory;
 import org.jetbrains.annotations.NotNull;
@@ -26,10 +26,14 @@ class SatelliteSessionManagerImpl implements ISatelliteSessionManager
   @Inject
   protected IMetricRecordSystemRepository metricRecordSystemRepository;
 
+  @Inject
+  protected IRepositoryChangeObserver repositoryChangeObserver;
+
   @Override
   public void registerSession(@NotNull Session pSession)
   {
-    pSession.addMessageHandler(WebsocketEvent.class, new SatelliteMessageHandler(authenticator, configFactory, metricRecordSystemRepository, pSession));
+    pSession.addMessageHandler(WebsocketEvent.class, new SatelliteMessageHandler(authenticator, configFactory, metricRecordSystemRepository,
+                                                                                 repositoryChangeObserver, pSession));
   }
 
   @Override
@@ -37,6 +41,8 @@ class SatelliteSessionManagerImpl implements ISatelliteSessionManager
   {
     pSession.getMessageHandlers().stream()
         .filter(SatelliteMessageHandler.class::isInstance)
+        .map(SatelliteMessageHandler.class::cast)
+        .peek(SatelliteMessageHandler::dispose)
         .forEach(pSession::removeMessageHandler);
   }
 
