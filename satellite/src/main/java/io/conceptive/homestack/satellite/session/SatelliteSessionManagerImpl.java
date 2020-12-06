@@ -1,6 +1,7 @@
 package io.conceptive.homestack.satellite.session;
 
 import io.conceptive.homestack.model.websocket.WebsocketEvent;
+import io.conceptive.homestack.repository.api.system.IMetricRecordSystemRepository;
 import io.conceptive.homestack.satellite.auth.ISatelliteAuthenticator;
 import io.conceptive.homestack.satellite.config.ISatelliteConfigFactory;
 import org.jetbrains.annotations.NotNull;
@@ -22,10 +23,13 @@ class SatelliteSessionManagerImpl implements ISatelliteSessionManager
   @Inject
   protected ISatelliteConfigFactory configFactory;
 
+  @Inject
+  protected IMetricRecordSystemRepository metricRecordSystemRepository;
+
   @Override
   public void registerSession(@NotNull Session pSession)
   {
-    pSession.addMessageHandler(WebsocketEvent.class, new SatelliteMessageHandler(authenticator, configFactory, pSession));
+    pSession.addMessageHandler(WebsocketEvent.class, new SatelliteMessageHandler(authenticator, configFactory, metricRecordSystemRepository, pSession));
   }
 
   @Override

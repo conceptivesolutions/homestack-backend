@@ -1,15 +1,18 @@
 package io.conceptive.homestack.satellite.session;
 
+import io.conceptive.homestack.model.data.MetricRecordDataModel;
 import io.conceptive.homestack.model.data.satellite.SatelliteLeaseDataModel;
 import io.conceptive.homestack.model.satellite.events.SatelliteWebSocketEvents;
 import io.conceptive.homestack.model.satellite.events.data.AuthenticateEventData;
 import io.conceptive.homestack.model.websocket.WebsocketEvent;
+import io.conceptive.homestack.repository.api.system.IMetricRecordSystemRepository;
 import io.conceptive.homestack.satellite.auth.ISatelliteAuthenticator;
 import io.conceptive.homestack.satellite.config.ISatelliteConfigFactory;
 import org.jboss.logging.Logger;
 import org.jetbrains.annotations.*;
 
 import javax.websocket.*;
+import java.util.Set;
 
 /**
  * Handles all websocket events
@@ -20,16 +23,20 @@ import javax.websocket.*;
 class SatelliteMessageHandler implements MessageHandler.Whole<WebsocketEvent>
 {
   private static final String _SESSIONKEY_AUTHORIZED = "authorized";
+  private static final String _SESSIONKEY_USER_ID = "userId";
   private static final String _SESSIONKEY_SATELLITE_ID = "id";
   private static final String _SESSIONKEY_SATELLITE_VERSION = "version";
   private final ISatelliteAuthenticator authenticator;
   private final ISatelliteConfigFactory configFactory;
+  private final IMetricRecordSystemRepository metricRecordSystemRepository;
   private final Session session;
 
-  public SatelliteMessageHandler(@NotNull ISatelliteAuthenticator pAuthenticator, @NotNull ISatelliteConfigFactory pConfigFactory, @NotNull Session pSession)
+  public SatelliteMessageHandler(@NotNull ISatelliteAuthenticator pAuthenticator, @NotNull ISatelliteConfigFactory pConfigFactory,
+                                 @NotNull IMetricRecordSystemRepository pMetricRecordSystemRepository, @NotNull Session pSession)
   {
     authenticator = pAuthenticator;
     configFactory = pConfigFactory;
+    metricRecordSystemRepository = pMetricRecordSystemRepository;
     session = pSession;
   }
 
@@ -40,7 +47,8 @@ class SatelliteMessageHandler implements MessageHandler.Whole<WebsocketEvent>
       return;
 
     // Determine, if authorized
-    if (Boolean.TRUE.equals(session.getUserProperties().get(_SESSIONKEY_AUTHORIZED)))
+    if (Boolean.TRUE.equals(session.getUserProperties().get(_SESSIONKEY_AUTHORIZED)) &&
+        session.getUserProperties().get(_SESSIONKEY_USER_ID) != null)
       _handleEventAuthorized(pEvent);
     else
       _handleEventUnauthorized(pEvent);
@@ -55,7 +63,7 @@ class SatelliteMessageHandler implements MessageHandler.Whole<WebsocketEvent>
   {
     if (pEvent.equalType(SatelliteWebSocketEvents.AUTHENTICATE))
     {
-      String satelliteID = null;
+      String leaseID = null;
       String version = null;
 
       try
@@ -64,25 +72,26 @@ class SatelliteMessageHandler implements MessageHandler.Whole<WebsocketEvent>
         version = data.version;
 
         // just ignore invalid requests
+        leaseID = data.leaseID;
         if (data.leaseID == null || data.leaseID.isBlank() || data.leaseToken == null || data.leaseToken.isBlank())
           return;
 
         // Authenticate (throws Exception, if invalid) and get satellite id
         SatelliteLeaseDataModel lease = authenticator.authenticate(data.leaseID, data.leaseToken);
-        satelliteID = lease.satelliteID;
 
         // set information to session because we know, that we are now authenticated - because of JWT decoded sucessfully
         session.getUserProperties().put(_SESSIONKEY_AUTHORIZED, true);
-        session.getUserProperties().put(_SESSIONKEY_SATELLITE_ID, satelliteID);
+        session.getUserProperties().put(_SESSIONKEY_USER_ID, lease.userID);
+        session.getUserProperties().put(_SESSIONKEY_SATELLITE_ID, lease.satelliteID);
         session.getUserProperties().put(_SESSIONKEY_SATELLITE_VERSION, version);
 
         // answer with (initial) config
-        session.getAsyncRemote().sendObject(SatelliteWebSocketEvents.CONFIG.payload(configFactory.create(lease.userID, satelliteID)));
+        session.getAsyncRemote().sendObject(SatelliteWebSocketEvents.CONFIG.payload(configFactory.create(lease.userID, lease.satelliteID)));
       }
       catch (Exception e)
       {
         _killSession();
-        Logger.getLogger(SatelliteMessageHandler.class).warn("Failed to authenticate satellite (" + satelliteID + ", " + version + ")");
+        Logger.getLogger(SatelliteMessageHandler.class).warn("Failed to authenticate satellite with lease (" + leaseID + ", " + version + ")");
       }
     }
     else
@@ -96,7 +105,20 @@ class SatelliteMessageHandler implements MessageHandler.Whole<WebsocketEvent>
    */
   private void _handleEventAuthorized(@NotNull WebsocketEvent<?> pEvent)
   {
-    Logger.getLogger(SatelliteMessageHandler.class).warn(pEvent + " was not handled, because no handler was registered for it");
+    String userID = (String) session.getUserProperties().get(_SESSIONKEY_USER_ID);
+    if (userID != null && !userID.isBlank())
+    {
+      if (pEvent.equalType(SatelliteWebSocketEvents.RECORDS))
+      {
+        Set<MetricRecordDataModel> records = SatelliteWebSocketEvents.RECORDS.payloadOf(pEvent).records;
+        if (records != null && !records.isEmpty())
+          metricRecordSystemRepository.insert(userID, records.toArray(new MetricRecordDataModel[0]));
+      }
+      else
+        Logger.getLogger(SatelliteMessageHandler.class).warn(pEvent + " was not handled, because no handler was registered for it");
+    }
+    else
+      Logger.getLogger(SatelliteMessageHandler.class).warn(pEvent + " was not handled, because user id is not defined in current session");
   }
 
   /**
