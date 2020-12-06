@@ -1,11 +1,11 @@
-package io.conceptive.homestack.backend.satellite.session;
+package io.conceptive.homestack.satellite.session;
 
-import io.conceptive.homestack.backend.satellite.auth.ISatelliteAuthenticator;
 import io.conceptive.homestack.model.data.*;
 import io.conceptive.homestack.model.satellite.SatelliteConfigurationDataModel;
 import io.conceptive.homestack.model.satellite.events.SatelliteWebSocketEvents;
 import io.conceptive.homestack.model.satellite.events.data.AuthenticateEventData;
 import io.conceptive.homestack.model.websocket.WebsocketEvent;
+import io.conceptive.homestack.satellite.auth.ISatelliteAuthenticator;
 import org.jboss.logging.Logger;
 import org.jetbrains.annotations.*;
 

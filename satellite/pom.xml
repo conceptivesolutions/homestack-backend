@@ -9,18 +9,13 @@
     <version>1.0.0</version>
   </parent>
 
-  <artifactId>backend</artifactId>
-  <name>HomeStack: Backend</name>
+  <artifactId>satellite</artifactId>
+  <name>Homestack: Backend: Satellite Endpoint</name>
 
   <dependencies>
     <dependency>
       <groupId>io.conceptive.homestack</groupId>
       <artifactId>repository</artifactId>
-      <version>${project.version}</version>
-    </dependency>
-    <dependency>
-      <groupId>io.conceptive.homestack</groupId>
-      <artifactId>satellite</artifactId>
       <version>${project.version}</version>
     </dependency>
 
@@ -34,12 +29,6 @@
     <dependency>
       <groupId>io.quarkus</groupId>
       <artifactId>quarkus-resteasy-jsonb</artifactId>
-    </dependency>
-
-    <!-- OpenID Connect -->
-    <dependency>
-      <groupId>io.quarkus</groupId>
-      <artifactId>quarkus-oidc</artifactId>
     </dependency>
 
     <!-- WebSocket -->

@@ -1,7 +1,7 @@
-package io.conceptive.homestack.backend.satellite.session;
+package io.conceptive.homestack.satellite.session;
 
-import io.conceptive.homestack.backend.satellite.auth.ISatelliteAuthenticator;
 import io.conceptive.homestack.model.websocket.WebsocketEvent;
+import io.conceptive.homestack.satellite.auth.ISatelliteAuthenticator;
 import org.jetbrains.annotations.NotNull;
 
 import javax.enterprise.context.ApplicationScoped;

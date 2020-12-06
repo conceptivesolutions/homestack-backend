@@ -1,7 +1,7 @@
 package io.conceptive.homestack.backend.endpoints.satellite;
 
-import io.conceptive.homestack.backend.satellite.session.ISatelliteSessionManager;
 import io.conceptive.homestack.model.websocket.WebsocketEventCoder;
+import io.conceptive.homestack.satellite.session.ISatelliteSessionManager;
 import org.jetbrains.annotations.*;
 
 import javax.enterprise.context.ApplicationScoped;

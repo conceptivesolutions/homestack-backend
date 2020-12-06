@@ -1,4 +1,4 @@
-package io.conceptive.homestack.backend.satellite.auth;
+package io.conceptive.homestack.satellite.auth;
 
 import io.conceptive.homestack.model.data.satellite.SatelliteLeaseDataModel;
 import io.conceptive.homestack.repository.api.system.ISatelliteLeaseSystemRepository;

@@ -1,4 +1,4 @@
-package io.conceptive.homestack.backend.satellite.auth;
+package io.conceptive.homestack.satellite.auth;
 
 import io.quarkus.security.AuthenticationFailedException;
 import org.jetbrains.annotations.NotNull;

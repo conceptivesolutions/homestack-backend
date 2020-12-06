@@ -1,4 +1,4 @@
-package io.conceptive.homestack.backend.satellite.session;
+package io.conceptive.homestack.satellite.session;
 
 import org.jetbrains.annotations.NotNull;
 
