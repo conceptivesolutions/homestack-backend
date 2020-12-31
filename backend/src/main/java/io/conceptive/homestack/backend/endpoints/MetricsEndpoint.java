@@ -98,24 +98,41 @@ public class MetricsEndpoint
   }
 
   /**
-   * Returns the latest record for a single metric type
+   * Returns the (latest) record for a single metric type
    *
    * @param pDeviceID   ID of the device
    * @param pMetricType Type of the metric to search
+   * @param pFrom       Unix Timestamp for the starting time (null = get only latest)
+   * @param pTo         Unix Timestamp for the ending time (null = get until latest)
    */
   @GET
   @Path("/records/{metricType}")
   @Produces(MediaType.APPLICATION_JSON)
-  public MetricRecordDataModel getRecord(@Nullable @PathParam("deviceID") String pDeviceID, @Nullable @PathParam("metricType") String pMetricType)
+  public Object getRecord(@Nullable @PathParam("deviceID") String pDeviceID, @Nullable @PathParam("metricType") String pMetricType,
+                          @Nullable @QueryParam("from") Long pFrom, @Nullable @QueryParam("to") Long pTo)
   {
     if (pDeviceID == null || pDeviceID.isBlank() || pMetricType == null || pMetricType.isBlank())
       throw new BadRequestException();
 
-    MetricRecordDataModel record = metricsRecordRepository.findByType(pDeviceID, pMetricType);
-    if (record == null)
-      throw new NotFoundException();
+    if (pFrom == null)
+    {
+      MetricRecordDataModel record = metricsRecordRepository.findByType(pDeviceID, pMetricType);
+      if (record == null)
+        throw new NotFoundException();
+      return record;
+    }
+    else
+    {
+      // Correctly set to-timestamp
+      if (pTo == null)
+        pTo = System.currentTimeMillis();
 
-    return record;
+      // verify range bounds, so we are not selecting too much stuff
+      if (pTo - pFrom > 14 * 24 * 60 * 60 * 1000) // 14d
+        throw new BadRequestException("Range bounds exceeded (14d)");
+
+      return metricsRecordRepository.findByTypeInRange(pDeviceID, pMetricType, pFrom, pTo);
+    }
   }
 
 }

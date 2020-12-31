@@ -30,4 +30,16 @@ public interface IMetricRecordUserRepository
   @Nullable
   MetricRecordDataModel findByType(@NotNull String pDeviceID, @NotNull String pType);
 
+  /**
+   * Searches the records for a single device with the given metric type in the given range
+   *
+   * @param pDeviceID ID of the device
+   * @param pType     Type of the record to search for
+   * @param pFrom     Unix Timestamp for the starting time
+   * @param pTo       Unix Timestamp for the ending time
+   * @return the record
+   */
+  @NotNull
+  Set<MetricRecordDataModel> findByTypeInRange(@NotNull String pDeviceID, @NotNull String pType, @NotNull Long pFrom, @NotNull Long pTo);
+
 }

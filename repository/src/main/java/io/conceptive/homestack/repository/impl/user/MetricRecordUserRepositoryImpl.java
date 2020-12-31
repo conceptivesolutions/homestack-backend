@@ -40,6 +40,16 @@ class MetricRecordUserRepositoryImpl extends AbstractUserRepository<MetricRecord
 
   @NotNull
   @Override
+  public Set<MetricRecordDataModel> findByTypeInRange(@NotNull String pDeviceID, @NotNull String pType, @NotNull Long pFrom, @NotNull Long pTo)
+  {
+    return Sets.newHashSet(getCollection()
+                               .find(Filters.and(Filters.eq("deviceID", pDeviceID), Filters.eq("type", pType),
+                                                 Filters.gte("recordTime", new Date(pFrom)), Filters.lte("recordTime", new Date(pTo))))
+                               .sort(Sorts.ascending("recordTime")));
+  }
+
+  @NotNull
+  @Override
   protected Class<MetricRecordDataModel> getCollectionType()
   {
     return MetricRecordDataModel.class;
