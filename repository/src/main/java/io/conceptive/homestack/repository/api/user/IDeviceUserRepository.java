@@ -2,7 +2,7 @@ package io.conceptive.homestack.repository.api.user;
 
 import io.conceptive.homestack.model.data.DeviceDataModel;
 import io.conceptive.homestack.repository.api.IObjectRepository;
-import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.*;
 
 import java.util.Set;
 
@@ -20,5 +20,14 @@ public interface IDeviceUserRepository extends IObjectRepository<DeviceDataModel
    */
   @NotNull
   Set<DeviceDataModel> findByStackID(@NotNull String pStackID);
+
+  /**
+   * Returns the device that owns the slot with the given id
+   *
+   * @param pSlotID ID of the slot
+   * @return the device or null, if it could not be found
+   */
+  @Nullable
+  DeviceDataModel findBySlotID(@NotNull String pSlotID);
 
 }

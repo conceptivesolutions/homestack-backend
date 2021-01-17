@@ -1,6 +1,7 @@
 package io.conceptive.homestack.repository.impl.user.object;
 
 import com.google.common.collect.Sets;
+import com.mongodb.BasicDBObject;
 import com.mongodb.client.model.Filters;
 import io.conceptive.homestack.model.data.DeviceDataModel;
 import io.conceptive.homestack.repository.api.user.IDeviceUserRepository;
@@ -23,6 +24,13 @@ class DeviceUserRepositoryImpl extends AbstractObjectUserRepository<DeviceDataMo
   public synchronized Set<DeviceDataModel> findByStackID(@NotNull String pStackID)
   {
     return Sets.newHashSet(getCollection().find(Filters.eq("stackID", pStackID)));
+  }
+
+  @Nullable
+  @Override
+  public DeviceDataModel findBySlotID(@NotNull String pSlotID)
+  {
+    return getCollection().find(Filters.elemMatch("slots", new BasicDBObject("$elemMatch", Filters.eq("_id", pSlotID)))).first();
   }
 
   @NotNull
