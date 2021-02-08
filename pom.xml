@@ -11,10 +11,9 @@
   </parent>
 
   <groupId>io.conceptive.homestack</groupId>
-  <artifactId>backend-parent</artifactId>
+  <artifactId>backend</artifactId>
   <version>1.0.0</version>
-  <name>HomeStack: Backend Parent</name>
-  <packaging>pom</packaging>
+  <name>HomeStack: Backend</name>
 
   <properties>
     <quarkus.version>1.9.2.Final</quarkus.version>
@@ -41,13 +40,37 @@
     </dependencies>
   </dependencyManagement>
 
-  <modules>
-    <module>backend</module>
-    <module>repository</module>
-    <module>satellite</module>
-  </modules>
-
   <dependencies>
+    <!-- HomeStack Models -->
+    <dependency>
+      <groupId>io.conceptive.homestack</groupId>
+      <artifactId>model</artifactId>
+    </dependency>
+
+    <!-- REST -->
+    <dependency>
+      <groupId>io.quarkus</groupId>
+      <artifactId>quarkus-resteasy-jsonb</artifactId>
+    </dependency>
+
+    <!-- OpenID Connect -->
+    <dependency>
+      <groupId>io.quarkus</groupId>
+      <artifactId>quarkus-oidc</artifactId>
+    </dependency>
+
+    <!-- WebSocket -->
+    <dependency>
+      <groupId>io.quarkus</groupId>
+      <artifactId>quarkus-undertow-websockets</artifactId>
+    </dependency>
+
+    <!-- MongoDB Client -->
+    <dependency>
+      <groupId>io.quarkus</groupId>
+      <artifactId>quarkus-mongodb-client</artifactId>
+    </dependency>
+
     <!-- Guava -->
     <dependency>
       <groupId>com.google.guava</groupId>

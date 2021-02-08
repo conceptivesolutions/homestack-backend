@@ -43,13 +43,11 @@ jobs:
 
       # Create Docker Image
       - name: Create Image
-        working-directory: ./backend
         run: |
           docker build -f src/main/docker/Dockerfile.jvm -t images.conceptive.io/homestack.backend:latest -t images.conceptive.io/homestack.backend:${{ env.RELEASE_VERSION }} .
 
       # Push Docker Image
       - name: Push Image
-        working-directory: ./backend
         run: |
           docker push images.conceptive.io/homestack.backend:latest
           docker push images.conceptive.io/homestack.backend:${{ env.RELEASE_VERSION }}
