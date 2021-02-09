@@ -16,7 +16,7 @@
   <name>HomeStack: Backend</name>
 
   <properties>
-    <quarkus.version>1.9.2.Final</quarkus.version>
+    <quarkus.version>1.11.2.Final</quarkus.version>
     <model.version>1.4.0</model.version>
   </properties>
 
@@ -47,41 +47,10 @@
       <artifactId>model</artifactId>
     </dependency>
 
-    <!-- REST -->
-    <dependency>
-      <groupId>io.quarkus</groupId>
-      <artifactId>quarkus-resteasy-jsonb</artifactId>
-    </dependency>
-
-    <!-- OpenID Connect -->
-    <dependency>
-      <groupId>io.quarkus</groupId>
-      <artifactId>quarkus-oidc</artifactId>
-    </dependency>
-
-    <!-- WebSocket -->
-    <dependency>
-      <groupId>io.quarkus</groupId>
-      <artifactId>quarkus-undertow-websockets</artifactId>
-    </dependency>
-
-    <!-- MongoDB Client -->
-    <dependency>
-      <groupId>io.quarkus</groupId>
-      <artifactId>quarkus-mongodb-client</artifactId>
-    </dependency>
-
     <!-- Guava -->
     <dependency>
       <groupId>com.google.guava</groupId>
       <artifactId>guava</artifactId>
-    </dependency>
-
-    <!-- JUnit -->
-    <dependency>
-      <groupId>junit</groupId>
-      <artifactId>junit</artifactId>
-      <scope>test</scope>
     </dependency>
 
     <!-- rxJava -->
