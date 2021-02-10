@@ -1,7 +1,7 @@
 <component name="ProjectRunConfigurationManager">
   <configuration default="false" name="Backend" type="QuarkusMavenBridge">
     <option name="jreName" value="11" />
-    <option name="vmOptions" value="-Ddb.user=homestackdev -Ddb.password=homestackdev -Ddb.address=localhost:27017" />
+    <option name="vmOptions" />
     <option name="workingDir" value="$PROJECT_DIR$" />
     <method v="2" />
   </configuration>
