@@ -53,6 +53,16 @@
       <artifactId>quarkus-smallrye-graphql</artifactId>
     </dependency>
 
+    <!-- Cassandra -->
+    <dependency>
+      <groupId>com.datastax.oss.quarkus</groupId>
+      <artifactId>cassandra-quarkus-client</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>com.datastax.oss</groupId>
+      <artifactId>java-driver-query-builder</artifactId>
+    </dependency>
+
     <!-- OpenID Connect -->
     <dependency>
       <groupId>io.quarkus</groupId>

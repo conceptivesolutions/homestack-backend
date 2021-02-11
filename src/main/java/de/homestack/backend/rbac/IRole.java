@@ -11,4 +11,9 @@ public interface IRole
    * Default-User that has all default permissions
    */
   String DEFAULT = "user";
+
+  /**
+   * Administrator Role
+   */
+  String ADMIN = "admin";
 }
