@@ -40,12 +40,23 @@ class CassandraSessionProvider
   public synchronized CqlSession get()
   {
     if (session == null || session.isClosed())
-      session = CqlSession.builder()
-          .addContactPoint(new InetSocketAddress(cassandraHost, Integer.parseInt(cassandraPort)))
-          .withAuthCredentials(cassandraUsername, cassandraPassword)
-          .withLocalDatacenter(cassandraDataCenter)
-          .build();
+      session = create();
     return session;
+  }
+
+  /**
+   * Creates always a new cql session
+   *
+   * @return the session
+   */
+  @NotNull
+  public synchronized CqlSession create()
+  {
+    return CqlSession.builder()
+        .addContactPoint(new InetSocketAddress(cassandraHost, Integer.parseInt(cassandraPort)))
+        .withAuthCredentials(cassandraUsername, cassandraPassword)
+        .withLocalDatacenter(cassandraDataCenter)
+        .build();
   }
 
   /**

@@ -1,6 +1,7 @@
 package de.homestack.backend.database;
 
-import de.homestack.backend.database.migration.ICassandraMigrationExecutor;
+import com.datastax.oss.driver.api.querybuilder.SchemaBuilder;
+import org.cognitor.cassandra.migration.*;
 import org.jetbrains.annotations.NotNull;
 
 import javax.enterprise.context.ApplicationScoped;
@@ -16,20 +17,33 @@ class CassandraSystemDBFacade implements ISystemDBFacade
   @Inject
   protected CassandraSessionProvider sessionProvider;
 
-  @Inject
-  protected ICassandraMigrationExecutor migrationExecutor;
-
   @Override
   public void migrateToLatest(@NotNull String pUserID)
   {
     try
     {
-      migrationExecutor.migrateToLatest(sessionProvider.get(), sessionProvider.getKeyspaceName(pUserID), pUserID);
+      String keyspaceName = sessionProvider.getKeyspaceName(pUserID);
+
+      // Create Keyspace
+      sessionProvider.get().execute(SchemaBuilder.createKeyspace(keyspaceName)
+                                        .ifNotExists()
+                                        .withSimpleStrategy(1)
+                                        .build());
+
+      // Migrate Keyspace to latest
+      new MigrationTask(new Database(sessionProvider.create(), keyspaceName), new _MigrationRepository()).migrate();
     }
     catch (Exception e)
     {
       throw new RuntimeException("Failed to initialize user space for user " + pUserID, e);
     }
+  }
+
+  /**
+   * We have to override the repository, because of a different classloader
+   */
+  private static class _MigrationRepository extends MigrationRepository
+  {
   }
 
 }
