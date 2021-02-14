@@ -1,6 +1,6 @@
 package de.homestack.backend.database;
 
-import com.datastax.oss.driver.api.core.CqlSession;
+import com.datastax.oss.driver.api.core.*;
 import com.datastax.oss.driver.api.core.config.*;
 import org.eclipse.microprofile.config.inject.ConfigProperty;
 import org.jetbrains.annotations.NotNull;
@@ -8,6 +8,7 @@ import org.jetbrains.annotations.NotNull;
 import javax.enterprise.context.ApplicationScoped;
 import java.net.InetSocketAddress;
 import java.time.Duration;
+import java.util.Optional;
 
 /**
  * @author w.glanzer, 10.02.2021
@@ -22,14 +23,14 @@ class CassandraSessionProvider
   @ConfigProperty(name = "homestack.cassandra.port", defaultValue = "9042")
   protected String cassandraPort;
 
-  @ConfigProperty(name = "homestack.cassandra.username")
-  protected String cassandraUsername;
-
-  @ConfigProperty(name = "homestack.cassandra.password")
-  protected String cassandraPassword;
-
   @ConfigProperty(name = "homestack.cassandra.datacenter")
   protected String cassandraDataCenter;
+
+  @ConfigProperty(name = "homestack.cassandra.username")
+  protected Optional<String> cassandraUsername;
+
+  @ConfigProperty(name = "homestack.cassandra.password")
+  protected Optional<String> cassandraPassword;
 
   private CqlSession session;
 
@@ -54,17 +55,21 @@ class CassandraSessionProvider
   @NotNull
   public synchronized CqlSession create()
   {
-    return CqlSession.builder()
+    CqlSessionBuilder builder = CqlSession.builder()
         .addContactPoint(new InetSocketAddress(cassandraHost, Integer.parseInt(cassandraPort)))
-        .withAuthCredentials(cassandraUsername, cassandraPassword)
         .withLocalDatacenter(cassandraDataCenter)
         .withConfigLoader(DriverConfigLoader.programmaticBuilder()
                               .withDuration(DefaultDriverOption.REQUEST_TIMEOUT, Duration.ofSeconds(15))
                               .withBoolean(DefaultDriverOption.REQUEST_WARN_IF_SET_KEYSPACE, false)
                               .withInt(DefaultDriverOption.SESSION_LEAK_THRESHOLD, 10)
                               .withString(DefaultDriverOption.PROTOCOL_VERSION, "V5")
-                              .build())
-        .build();
+                              .build());
+
+    // specify user/password, if necessary
+    if (cassandraUsername.isPresent() || cassandraPassword.isPresent())
+      builder = builder.withAuthCredentials(cassandraUsername.orElse(""), cassandraPassword.orElse(""));
+
+    return builder.build();
   }
 
   /**
