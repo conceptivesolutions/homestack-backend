@@ -10,10 +10,8 @@
             <option name="environmentProperties">
               <map>
                 <entry key="HOMESTACK_CASSANDRA_DATACENTER" value="datacenter1" />
-                <entry key="HOMESTACK_CASSANDRA_HOST" value="127.0.0.1" />
-                <entry key="HOMESTACK_CASSANDRA_PASSWORD" value="cassandra" />
-                <entry key="HOMESTACK_CASSANDRA_PORT" value="9042" />
-                <entry key="HOMESTACK_CASSANDRA_USERNAME" value="cassandra" />
+                <entry key="HOMESTACK_CASSANDRA_HOST" value="loku-master.home.lan" />
+                <entry key="HOMESTACK_CASSANDRA_PORT" value="29042" />
               </map>
             </option>
             <option name="jreName" value="#USE_PROJECT_JDK" />
@@ -23,7 +21,7 @@
             <option name="passParentEnv" value="true" />
             <option name="runMavenInBackground" value="true" />
             <option name="skipTests" value="false" />
-            <option name="vmOptions" value="" />
+            <option name="vmOptions" value="-Ddebug=true" />
           </MavenRunnerSettings>
         </option>
         <option name="myRunnerParameters">
@@ -38,7 +36,9 @@
             </option>
             <option name="pomFileName" value="pom.xml" />
             <option name="profilesMap">
-              <map />
+              <map>
+                <entry key="jvm" value="true" />
+              </map>
             </option>
             <option name="resolveToWorkspace" value="false" />
             <option name="workingDirPath" value="$PROJECT_DIR$" />

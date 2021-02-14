@@ -67,6 +67,11 @@
       <artifactId>cassandra-migration</artifactId>
       <version>2.4.0_v4</version>
     </dependency>
+    <dependency>
+      <groupId>io.dropwizard.metrics</groupId>
+      <artifactId>metrics-core</artifactId>
+      <version>4.1.16</version>
+    </dependency>
 
     <!-- OpenID Connect -->
     <dependency>
