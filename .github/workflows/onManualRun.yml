@@ -1,0 +1,44 @@
+name: Compile / onManualRun
+
+on:
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-20.04
+    steps:
+      - name: Setup / Checkout
+        uses: actions/checkout@v2
+
+      - name: Setup / JDK
+        uses: actions/setup-java@v1
+        with:
+          java-version: 11
+
+      - name: Setup / settings.xml
+        uses: s4u/maven-settings-action@v2.2.0
+        with:
+          servers: '[{"id": "default", "username": "${{ secrets.nexus_user }}", "password": "${{ secrets.nexus_password }}"}]'
+          mirrors: '[{"id": "default", "name": "default", "mirrorOf": "*", "url": "https://nexus.conceptive.io/repository/maven-public/"}]'
+
+      - name: Setup / Docker Login
+        uses: azure/docker-login@v1
+        with:
+          login-server: images.conceptive.io
+          username: ${{ secrets.nexus_user }}
+          password: ${{ secrets.nexus_password }}
+
+      - name: JVM / Compile
+        run: mvn -T 1C clean package
+
+      - name: JVM / Integration Test
+        run: mvn failsafe:integration-test failsafe:verify
+
+      - name: Native / Compile
+        run: mvn -T 1C clean package -Pnative -Dquarkus.container-image.build=true
+
+      - name: Native / Integration Test
+        run: mvn -Pnative test-compile failsafe:integration-test failsafe:verify
+
+      - name: Deploy / Docker
+        run: docker push images.conceptive.io/homestack.backend:latest
