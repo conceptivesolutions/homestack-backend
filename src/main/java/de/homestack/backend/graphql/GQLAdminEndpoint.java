@@ -3,9 +3,12 @@ package de.homestack.backend.graphql;
 import de.homestack.backend.database.ISystemDBFacade;
 import de.homestack.backend.rbac.IRole;
 import org.eclipse.microprofile.graphql.*;
+import org.eclipse.microprofile.jwt.JsonWebToken;
+import org.jboss.logging.Logger;
 
 import javax.annotation.security.RolesAllowed;
 import javax.inject.Inject;
+import java.util.concurrent.*;
 
 /**
  * Contains all methods for administrators only
@@ -20,6 +23,12 @@ public class GQLAdminEndpoint
   @Inject
   protected ISystemDBFacade systemDBFacade;
 
+  @Inject
+  protected Logger logger;
+
+  @Inject
+  protected JsonWebToken token;
+
   /**
    * Migrates the user with the given ID to the newest database version
    *
@@ -32,6 +41,28 @@ public class GQLAdminEndpoint
   {
     systemDBFacade.migrateToLatest(pUserID);
     return pUserID;
+  }
+
+  /**
+   * Queues a shutdown of the whole server
+   *
+   * @return true, if it was sucessfully queued
+   */
+  @Query("shutdown")
+  @NonNull
+  public Boolean shutdown()
+  {
+    // Log about shutdown
+    logger.warn("Server shutdown queued by user " + token.getSubject());
+
+    // Schedule Shutdown
+    Executors.newSingleThreadScheduledExecutor().schedule(() -> {
+      logger.warn("Exitting...");
+      System.exit(0);
+    }, 1, TimeUnit.SECONDS);
+
+    // return true always..
+    return true;
   }
 
 }
