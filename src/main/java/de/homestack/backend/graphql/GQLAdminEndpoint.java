@@ -1,6 +1,6 @@
 package de.homestack.backend.graphql;
 
-import de.homestack.backend.database.ISystemDBFacade;
+import de.homestack.backend.database.IDBMigrationProvider;
 import de.homestack.backend.rbac.IRole;
 import org.eclipse.microprofile.graphql.*;
 import org.eclipse.microprofile.jwt.JsonWebToken;
@@ -21,7 +21,7 @@ public class GQLAdminEndpoint
 {
 
   @Inject
-  protected ISystemDBFacade systemDBFacade;
+  protected IDBMigrationProvider dbMigrationProvider;
 
   @Inject
   protected Logger logger;
@@ -39,7 +39,7 @@ public class GQLAdminEndpoint
   @NonNull
   public String migrateUser(@NonNull @Name("id") String pUserID)
   {
-    systemDBFacade.migrateToLatest(pUserID);
+    dbMigrationProvider.migrateUserToLatest(pUserID);
     return pUserID;
   }
 
