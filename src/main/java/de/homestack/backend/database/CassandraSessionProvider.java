@@ -1,11 +1,13 @@
 package de.homestack.backend.database;
 
 import com.datastax.oss.driver.api.core.CqlSession;
+import com.datastax.oss.driver.api.core.config.*;
 import org.eclipse.microprofile.config.inject.ConfigProperty;
 import org.jetbrains.annotations.NotNull;
 
 import javax.enterprise.context.ApplicationScoped;
 import java.net.InetSocketAddress;
+import java.time.Duration;
 
 /**
  * @author w.glanzer, 10.02.2021
@@ -56,6 +58,12 @@ class CassandraSessionProvider
         .addContactPoint(new InetSocketAddress(cassandraHost, Integer.parseInt(cassandraPort)))
         .withAuthCredentials(cassandraUsername, cassandraPassword)
         .withLocalDatacenter(cassandraDataCenter)
+        .withConfigLoader(DriverConfigLoader.programmaticBuilder()
+                              .withDuration(DefaultDriverOption.REQUEST_TIMEOUT, Duration.ofSeconds(15))
+                              .withBoolean(DefaultDriverOption.REQUEST_WARN_IF_SET_KEYSPACE, false)
+                              .withInt(DefaultDriverOption.SESSION_LEAK_THRESHOLD, 10)
+                              .withString(DefaultDriverOption.PROTOCOL_VERSION, "V5")
+                              .build())
         .build();
   }
 
