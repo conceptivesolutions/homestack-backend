@@ -1,13 +1,16 @@
 package de.homestack.backend.graphql.types;
 
+import lombok.*;
+import org.eclipse.microprofile.graphql.NonNull;
 import org.eclipse.microprofile.graphql.*;
-import org.jetbrains.annotations.*;
 
 /**
  * @author w.glanzer, 10.02.2021
  */
 @Type("Property")
-public class PropertyType
+@NoArgsConstructor
+@AllArgsConstructor
+public class GQLProperty
 {
 
   /**
@@ -21,17 +24,4 @@ public class PropertyType
    */
   public String value;
 
-  @NotNull
-  public PropertyType key(@NotNull String pKey)
-  {
-    key = pKey;
-    return this;
-  }
-
-  @NotNull
-  public PropertyType value(@Nullable String pValue)
-  {
-    value = pValue;
-    return this;
-  }
 }

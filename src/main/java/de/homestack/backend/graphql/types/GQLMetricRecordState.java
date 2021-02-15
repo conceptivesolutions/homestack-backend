@@ -4,10 +4,9 @@ import org.eclipse.microprofile.graphql.Enum;
 
 /**
  * @author w.glanzer, 10.02.2021
- * @see io.conceptive.homestack.model.data.metric.EMetricRecordState
  */
 @Enum("RecordState")
-public enum EMetricRecordStateType
+public enum GQLMetricRecordState
 {
   /**
    * Device FAILED, so it can not be used anywhere

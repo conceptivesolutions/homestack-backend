@@ -120,6 +120,14 @@
       <artifactId>quarkus-container-image-jib</artifactId>
     </dependency>
 
+    <!-- Lombok -->
+    <dependency>
+      <groupId>org.projectlombok</groupId>
+      <artifactId>lombok</artifactId>
+      <version>1.18.16</version>
+      <scope>provided</scope>
+    </dependency>
+
     <!-- JUnit -->
     <dependency>
       <groupId>io.quarkus</groupId>
