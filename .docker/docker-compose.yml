@@ -9,7 +9,7 @@ services:
       - 8080:8080
     environment:
       HOMESTACK_CASSANDRA_DATACENTER: datacenter1
-      HOMESTACK_CASSANDRA_HOST: loku-master.home.lan
+      HOMESTACK_CASSANDRA_HOST: nodered.home.lan
       HOMESTACK_CASSANDRA_USERNAME: cassandra
-      HOMESTACK_CASSANDRA_PORT: 29042
+      HOMESTACK_CASSANDRA_PORT: 9042
       HOMESTACK_CASSANDRA_PASSWORD: cassandra

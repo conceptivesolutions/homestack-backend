@@ -10,8 +10,7 @@
             <option name="environmentProperties">
               <map>
                 <entry key="HOMESTACK_CASSANDRA_DATACENTER" value="datacenter1" />
-                <entry key="HOMESTACK_CASSANDRA_HOST" value="loku-master.home.lan" />
-                <entry key="HOMESTACK_CASSANDRA_PORT" value="29042" />
+                <entry key="HOMESTACK_CASSANDRA_HOST" value="nodered.home.lan" />
               </map>
             </option>
             <option name="jreName" value="#USE_PROJECT_JDK" />
@@ -30,9 +29,7 @@
               <set />
             </option>
             <option name="goals">
-              <list>
-                <option value="quarkus:dev" />
-              </list>
+              <list />
             </option>
             <option name="pomFileName" value="pom.xml" />
             <option name="profilesMap">
