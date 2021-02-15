@@ -14,7 +14,7 @@ import java.util.Optional;
  * @author w.glanzer, 10.02.2021
  */
 @ApplicationScoped
-class CassandraSessionProvider
+public class CassandraSessionProvider
 {
 
   @ConfigProperty(name = "homestack.cassandra.host")
