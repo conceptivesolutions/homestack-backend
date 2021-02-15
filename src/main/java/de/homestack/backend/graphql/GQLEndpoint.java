@@ -1,15 +1,21 @@
 package de.homestack.backend.graphql;
 
+import de.homestack.backend.database.user.IStackDBFacade;
 import de.homestack.backend.graphql.types.*;
 import de.homestack.backend.rbac.IRole;
-import org.apache.commons.lang3.NotImplementedException;
+import io.conceptive.homestack.model.data.StackDataModel;
+import io.quarkus.security.UnauthorizedException;
 import org.eclipse.microprofile.graphql.*;
+import org.eclipse.microprofile.jwt.JsonWebToken;
+import org.jetbrains.annotations.NotNull;
 
 import javax.annotation.security.RolesAllowed;
+import javax.inject.Inject;
 import java.util.List;
+import java.util.stream.Collectors;
 
 /**
- * Endpoint for common GraphQL communication
+ * Endpoint for retrieving / mutating data
  *
  * @author w.glanzer, 10.02.2021
  */
@@ -18,74 +24,76 @@ import java.util.List;
 public class GQLEndpoint
 {
 
+  @Inject
+  protected JsonWebToken userToken;
+
+  @Inject
+  protected IStackDBFacade stacksFacade;
+
+  @Inject
+  protected GraphQLTypeFactory typeFactory;
+
+  /**
+   * @return Returns all stacks for the current user
+   */
   @Query
   @NonNull
-  public List<StackType> getStacks()
+  public List<GQLStack> getStacks()
   {
-    throw new NotImplementedException();
+    return stacksFacade.getStacks(_getUserID()).stream()
+        .map(typeFactory::fromModel)
+        .collect(Collectors.toList());
   }
 
+  /**
+   * Searches for a stack with the given id
+   *
+   * @param pStackID ID of the stack to search for
+   * @return the stack or null, if not found
+   */
   @Query
-  @NonNull
-  public StackType getStack(@NonNull @Name("id") String pStackID)
+  public GQLStack getStack(@NonNull @Name("id") String pStackID)
   {
-    throw new NotImplementedException();
+    StackDataModel stack = stacksFacade.getStackByID(_getUserID(), pStackID);
+    if (stack == null)
+      return null;
+    return typeFactory.fromModel(stack);
   }
 
-  @Query
-  @NonNull
-  public List<DeviceType> getDevices(@NonNull @Source @Name("stack") StackType pStack)
+  /**
+   * Inserts / Updates the given stack
+   *
+   * @param pStack Stack to update / insert
+   * @return the updated / inserted stack
+   */
+  @Mutation
+  public GQLStack upsertStack(@NonNull @Name("stack") GQLStack pStack)
   {
-    throw new NotImplementedException();
+    return typeFactory.fromModel(stacksFacade.upsertStack(_getUserID(), typeFactory.toModel(pStack)));
   }
 
-  @Query
-  @NonNull
-  public DeviceType getDevice(@NonNull @Name("id") String pDeviceID)
+  /**
+   * Deletes a stack with the given id
+   *
+   * @param pStackID ID of the stack to delete
+   * @return true, if it was deleted
+   */
+  @Mutation
+  public boolean deleteStack(@NonNull @Name("id") String pStackID)
   {
-    throw new NotImplementedException();
+    return stacksFacade.deleteStack(_getUserID(), pStackID);
   }
 
-  @Query
-  @NonNull
-  public List<SatelliteType> getSatellites(@NonNull @Source @Name("stack") StackType pStack)
+  /**
+   * @return ID of the user who is accessing this repository
+   */
+  @NotNull
+  private String _getUserID()
   {
-    throw new NotImplementedException();
-  }
-
-  @Query
-  @NonNull
-  public SatelliteType getSatellite(@NonNull @Name("id") String pSatelliteID)
-  {
-    throw new NotImplementedException();
-  }
-
-  @Query
-  @NonNull
-  public List<SatelliteLeaseType> getLeases(@NonNull @Source @Name("satellite") SatelliteType pSatellite)
-  {
-    throw new NotImplementedException();
-  }
-
-  @Query
-  @NonNull
-  public SatelliteLeaseType getLease(@NonNull @Name("id") String pLeaseID)
-  {
-    throw new NotImplementedException();
-  }
-
-  @Query
-  @NonNull
-  public List<MetricType> getMetrics(@NonNull @Source @Name("device") DeviceType pDevice)
-  {
-    throw new NotImplementedException();
-  }
-
-  @Query
-  @NonNull
-  public MetricType getMetric(@NonNull @Name("id") String pMetricID)
-  {
-    throw new NotImplementedException();
+    String subject = userToken.getSubject();
+    if (subject == null || subject.isBlank())
+      throw new UnauthorizedException();
+    return subject;
   }
 
 }
