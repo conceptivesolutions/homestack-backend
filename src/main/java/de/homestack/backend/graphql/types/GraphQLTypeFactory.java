@@ -26,9 +26,7 @@ public class GraphQLTypeFactory
                                  .map(this::fromModel)
                                  .collect(Collectors.toList()))
                              .collect(Collectors.toList()),
-                         pModel.metrics == null ? null : pModel.metrics.stream()
-                             .map(this::fromModel)
-                             .collect(Collectors.toList()));
+                         null);
   }
 
   @NotNull
@@ -68,10 +66,7 @@ public class GraphQLTypeFactory
   @NotNull
   public GQLSatellite fromModel(@NotNull SatelliteDataModel pModel)
   {
-    return new GQLSatellite(pModel.id,
-                            pModel.leases == null ? null : pModel.leases.stream()
-                                .map(this::fromModel)
-                                .collect(Collectors.toList()));
+    return new GQLSatellite(pModel.id, null);
   }
 
   @NotNull
@@ -83,13 +78,7 @@ public class GraphQLTypeFactory
   @NotNull
   public GQLStack fromModel(@NotNull StackDataModel pModel)
   {
-    return new GQLStack(pModel.id, pModel.displayName,
-                        pModel.devices == null ? null : pModel.devices.stream()
-                            .map(this::fromModel)
-                            .collect(Collectors.toList()),
-                        pModel.satellites == null ? null : pModel.satellites.stream()
-                            .map(this::fromModel)
-                            .collect(Collectors.toList()));
+    return new GQLStack(pModel.id, pModel.displayName, null, null);
   }
 
   @NotNull
@@ -105,17 +94,14 @@ public class GraphQLTypeFactory
   }
 
   @NotNull
-  public DeviceDataModel toModel(@NotNull GQLDevice pModel)
+  public DeviceDataModel toModel(@NotNull GQLDevice pModel, @NotNull String pStackID)
   {
-    return new DeviceDataModel(pModel.id, pModel.icon, pModel.address,
+    return new DeviceDataModel(pModel.id, pStackID, pModel.icon, pModel.address,
                                pModel.location == null ? null : toModel(pModel.location),
                                pModel.slots == null ? null : pModel.slots.stream()
                                    .map(pSlots -> pSlots.stream()
                                        .map(this::toModel)
                                        .collect(Collectors.toList()))
-                                   .collect(Collectors.toList()),
-                               pModel.metrics == null ? null : pModel.metrics.stream()
-                                   .map(this::toModel)
                                    .collect(Collectors.toList()));
   }
 
@@ -126,9 +112,9 @@ public class GraphQLTypeFactory
   }
 
   @NotNull
-  public MetricDataModel toModel(@NotNull GQLMetric pModel)
+  public MetricDataModel toModel(@NotNull GQLMetric pModel, @NotNull String pDeviceID)
   {
-    return new MetricDataModel(pModel.id, pModel.type, pModel.enabled,
+    return new MetricDataModel(pModel.id, pDeviceID, pModel.type, pModel.enabled,
                                pModel.settings == null ? null : pModel.settings.stream()
                                    .collect(Collectors.toMap(pProp -> pProp.key, pProp -> pProp.value)));
   }
@@ -147,34 +133,25 @@ public class GraphQLTypeFactory
   {
     return new NetworkSlotDataModel(pModel.id,
                                     pModel.state == null ? null : toModel(pModel.state),
-                                    null);
+                                    pModel.targetSlot == null ? null : pModel.targetSlot.id);
   }
 
   @NotNull
-  public SatelliteDataModel toModel(@NotNull GQLSatellite pModel)
+  public SatelliteDataModel toModel(@NotNull GQLSatellite pModel, @NotNull String pStackID)
   {
-    return new SatelliteDataModel(pModel.id,
-                                  pModel.leases == null ? null : pModel.leases.stream()
-                                      .map(this::toModel)
-                                      .collect(Collectors.toList()));
+    return new SatelliteDataModel(pModel.id, pStackID);
   }
 
   @NotNull
-  public SatelliteLeaseDataModel toModel(@NotNull GQLSatelliteLease pModel)
+  public SatelliteLeaseDataModel toModel(@NotNull GQLSatelliteLease pModel, @NotNull String pSatelliteID)
   {
-    return new SatelliteLeaseDataModel(pModel.id, pModel.userID, pModel.revokedDate, pModel.token);
+    return new SatelliteLeaseDataModel(pModel.id, pSatelliteID, pModel.userID, pModel.revokedDate, pModel.token);
   }
 
   @NotNull
   public StackDataModel toModel(@NotNull GQLStack pModel)
   {
-    return new StackDataModel(pModel.id, pModel.displayName,
-                              pModel.devices == null ? null : pModel.devices.stream()
-                                  .map(this::toModel)
-                                  .collect(Collectors.toList()),
-                              pModel.satellites == null ? null : pModel.satellites.stream()
-                                  .map(this::toModel)
-                                  .collect(Collectors.toList()));
+    return new StackDataModel(pModel.id, pModel.displayName);
   }
 
   @NotNull
