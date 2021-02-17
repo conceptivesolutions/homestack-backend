@@ -10,7 +10,7 @@ import java.util.List;
  *
  * @author w.glanzer, 10.02.2021
  */
-public interface IStackDBFacade
+public interface IStackDBRepository
 {
 
   /**

@@ -12,7 +12,7 @@ import java.util.stream.Collectors;
  * @author w.glanzer, 10.02.2021
  */
 @ApplicationScoped
-class CassandraStackDBFacade extends AbstractCassandraDBFacade implements IStackDBFacade
+class CassandraStackDBRepository extends AbstractCassandraDBFacade implements IStackDBRepository
 {
 
   private static final String _TABLE_STACKS_BY_ID = "stacks_by_id";

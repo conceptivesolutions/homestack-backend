@@ -29,7 +29,7 @@ public class GQLEndpoint
   protected JsonWebToken userToken;
 
   @Inject
-  protected IStackDBFacade stacksFacade;
+  protected IStackDBRepository stackRepository;
 
   @Inject
   protected IDeviceDBRepository deviceRepository;
@@ -44,7 +44,7 @@ public class GQLEndpoint
   @NonNull
   public List<GQLStack> getStacks()
   {
-    return stacksFacade.getStacks(_getUserID()).stream()
+    return stackRepository.getStacks(_getUserID()).stream()
         .map(typeFactory::fromModel)
         .collect(Collectors.toList());
   }
@@ -73,7 +73,7 @@ public class GQLEndpoint
   @Query
   public GQLStack getStack(@NonNull @Name("id") String pStackID)
   {
-    StackDataModel stack = stacksFacade.getStackByID(_getUserID(), pStackID);
+    StackDataModel stack = stackRepository.getStackByID(_getUserID(), pStackID);
     if (stack == null)
       return null;
     return typeFactory.fromModel(stack);
@@ -104,7 +104,7 @@ public class GQLEndpoint
   @Mutation
   public GQLStack upsertStack(@NonNull @Name("stack") GQLStack pStack)
   {
-    return typeFactory.fromModel(stacksFacade.upsertStack(_getUserID(), typeFactory.toModel(pStack)));
+    return typeFactory.fromModel(stackRepository.upsertStack(_getUserID(), typeFactory.toModel(pStack)));
   }
 
   /**
@@ -129,7 +129,7 @@ public class GQLEndpoint
   @Mutation
   public boolean deleteStack(@NonNull @Name("id") String pStackID)
   {
-    return stacksFacade.deleteStack(_getUserID(), pStackID);
+    return stackRepository.deleteStack(_getUserID(), pStackID);
   }
 
   /**
