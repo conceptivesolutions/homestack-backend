@@ -120,9 +120,9 @@ public class GraphQLTypeFactory
   }
 
   @NotNull
-  public MetricRecordDataModel toModel(@NotNull GQLMetricRecord pModel)
+  public MetricRecordDataModel toModel(@NotNull GQLMetricRecord pModel, @NotNull String pMetricID)
   {
-    return new MetricRecordDataModel(pModel.id, null, pModel.recordTime,
+    return new MetricRecordDataModel(pModel.id, pMetricID, pModel.recordTime,
                                      pModel.state == null ? null : toModel(pModel.state),
                                      pModel.result == null ? null : pModel.result.stream()
                                          .collect(Collectors.toMap(pProp -> pProp.key, pProp -> pProp.value)));
