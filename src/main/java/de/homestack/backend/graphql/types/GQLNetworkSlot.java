@@ -26,8 +26,8 @@ public class GQLNetworkSlot
   public GQLNetworkSlotState state;
 
   /**
-   * The slot, if this slot is connected to another
+   * The slot ID, if this slot is connected to another
    */
-  public GQLNetworkSlot targetSlot;
+  public String targetSlotID;
 
 }

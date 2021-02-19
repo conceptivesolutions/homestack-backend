@@ -1,8 +1,10 @@
 package de.homestack.backend.database.user;
 
 import com.datastax.oss.driver.api.core.cql.*;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import de.homestack.backend.database.CassandraSessionProvider;
-import org.jetbrains.annotations.NotNull;
+import lombok.SneakyThrows;
+import org.jetbrains.annotations.*;
 
 import javax.inject.Inject;
 import java.util.stream.*;
@@ -12,6 +14,8 @@ import java.util.stream.*;
  */
 abstract class AbstractCassandraDBFacade
 {
+
+  private static final ObjectMapper mapper = new ObjectMapper();
 
   @Inject
   protected CassandraSessionProvider sessionProvider;
@@ -28,6 +32,37 @@ abstract class AbstractCassandraDBFacade
     return StreamSupport.stream(sessionProvider.get()
                                     .execute(pStatement)
                                     .spliterator(), false);
+  }
+
+  /**
+   * Converts the given object to a json string
+   *
+   * @param pObject object to convert
+   * @return the string or null, if pObject is null
+   */
+  @Nullable
+  @SneakyThrows
+  public String toJSON(@Nullable Object pObject)
+  {
+    if (pObject == null)
+      return null;
+    return mapper.writeValueAsString(pObject);
+  }
+
+  /**
+   * Converts the given string back to an object
+   *
+   * @param pType       Type
+   * @param pSerialized Serialized string
+   * @return the object
+   */
+  @SneakyThrows
+  @Contract("_, null -> null")
+  public <T> T fromJSON(@NotNull Class<T> pType, @Nullable String pSerialized)
+  {
+    if (pSerialized == null)
+      return null;
+    return mapper.readValue(pSerialized, pType);
   }
 
 }

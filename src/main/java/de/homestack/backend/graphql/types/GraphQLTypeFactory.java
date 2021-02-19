@@ -60,7 +60,7 @@ public class GraphQLTypeFactory
   {
     return new GQLNetworkSlot(pModel.id,
                               pModel.state == null ? null : fromModel(pModel.state),
-                              null);
+                              pModel.targetSlotID);
   }
 
   @NotNull
@@ -133,7 +133,7 @@ public class GraphQLTypeFactory
   {
     return new NetworkSlotDataModel(pModel.id,
                                     pModel.state == null ? null : toModel(pModel.state),
-                                    pModel.targetSlot == null ? null : pModel.targetSlot.id);
+                                    pModel.targetSlotID);
   }
 
   @NotNull

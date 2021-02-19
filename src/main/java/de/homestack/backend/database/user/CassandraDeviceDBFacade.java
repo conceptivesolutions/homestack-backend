@@ -2,7 +2,7 @@ package de.homestack.backend.database.user;
 
 import com.datastax.oss.driver.api.querybuilder.QueryBuilder;
 import io.conceptive.homestack.model.data.ScreenLocationDataModel;
-import io.conceptive.homestack.model.data.device.DeviceDataModel;
+import io.conceptive.homestack.model.data.device.*;
 import org.jetbrains.annotations.*;
 
 import javax.enterprise.context.ApplicationScoped;
@@ -23,10 +23,10 @@ class CassandraDeviceDBFacade extends AbstractCassandraDBFacade implements IDevi
   public List<DeviceDataModel> getDevicesByStackID(@NotNull String pUserID, @NotNull String pStackID)
   {
     return execute(QueryBuilder.selectFrom(sessionProvider.getKeyspaceName(pUserID), _TABLE_DEVICES_BY_STACKID)
-                       .columns("id", "icon", "address", "location")
+                       .columns("id", "icon", "address", "location", "slots")
                        .whereColumn("stackid").isEqualTo(QueryBuilder.literal(UUID.fromString(pStackID)))
                        .build())
-        .map(pRow -> _toDevice(pStackID, pRow.getUuid(0), pRow.getString(1), pRow.getString(2), pRow.getString(3)))
+        .map(pRow -> _toDevice(pStackID, pRow.getUuid(0), pRow.getString(1), pRow.getString(2), pRow.getString(3), pRow.getString(4)))
         .collect(Collectors.toList());
   }
 
@@ -35,11 +35,11 @@ class CassandraDeviceDBFacade extends AbstractCassandraDBFacade implements IDevi
   public DeviceDataModel getDeviceByID(@NotNull String pUserID, @NotNull String pStackID, @NotNull String pDeviceID)
   {
     return execute(QueryBuilder.selectFrom(sessionProvider.getKeyspaceName(pUserID), _TABLE_DEVICES_BY_STACKID)
-                       .columns("id", "icon", "address", "location")
+                       .columns("id", "icon", "address", "location", "slots")
                        .whereColumn("stackid").isEqualTo(QueryBuilder.literal(UUID.fromString(pStackID)))
                        .whereColumn("id").isEqualTo(QueryBuilder.literal(UUID.fromString(pDeviceID)))
                        .build())
-        .map(pRow -> _toDevice(pStackID, pRow.getUuid(0), pRow.getString(1), pRow.getString(2), pRow.getString(3)))
+        .map(pRow -> _toDevice(pStackID, pRow.getUuid(0), pRow.getString(1), pRow.getString(2), pRow.getString(3), pRow.getString(4)))
         .findFirst()
         .orElse(null);
   }
@@ -54,6 +54,9 @@ class CassandraDeviceDBFacade extends AbstractCassandraDBFacade implements IDevi
                 .value("icon", QueryBuilder.literal(pModel.icon))
                 .value("address", QueryBuilder.literal(pModel.address))
                 .value("location", QueryBuilder.literal(pModel.location == null ? null : pModel.location.x + "," + pModel.location.y))
+                .value("slots", QueryBuilder.literal(pModel.slots == null ? null : toJSON(pModel.slots.stream()
+                                                                                              .map(List::toArray)
+                                                                                              .toArray())))
                 .build());
     return pModel;
   }
@@ -72,13 +75,16 @@ class CassandraDeviceDBFacade extends AbstractCassandraDBFacade implements IDevi
   }
 
   @Nullable
-  private DeviceDataModel _toDevice(@NotNull String pStackID, @Nullable UUID pID, @Nullable String pIcon, @Nullable String pAddress, @Nullable String pLocation)
+  private DeviceDataModel _toDevice(@NotNull String pStackID, @Nullable UUID pID, @Nullable String pIcon, @Nullable String pAddress, @Nullable String pLocation, @Nullable String pSlots)
   {
     return DeviceDataModel.builder()
         .id(String.valueOf(pID))
         .stackID(pStackID)
         .icon(pIcon)
         .address(pAddress)
+        .slots(pSlots == null ? null : Arrays.stream(fromJSON(NetworkSlotDataModel[][].class, pSlots))
+            .map(Arrays::asList)
+            .collect(Collectors.toList()))
         .location(pLocation == null ? null : ScreenLocationDataModel.builder()
             .x(Float.parseFloat(Objects.requireNonNull(pLocation).split(",")[0]))
             .y(Float.parseFloat(Objects.requireNonNull(pLocation).split(",")[1]))

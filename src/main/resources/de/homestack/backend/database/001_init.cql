@@ -14,17 +14,8 @@ CREATE TABLE devices_by_stackid
     icon     TEXT,
     address  TEXT,
     location TEXT,
+    slots    TEXT,
     PRIMARY KEY ( stackid, id )
-);
-
--- Create slots_by_deviceid table
-CREATE TABLE slots_by_deviceid
-(
-    deviceid UUID,
-    id       UUID,
-    state    TEXT,
-    targetid UUID,
-    PRIMARY KEY ( deviceid, id )
 );
 
 -- Create metrics_by_deviceid table
