@@ -1,5 +1,5 @@
 -- Create stacks_by_id table
-CREATE TABLE stacks_by_id
+CREATE TABLE IF NOT EXISTS stacks_by_id
 (
     id          UUID,
     displayName TEXT,
@@ -7,7 +7,7 @@ CREATE TABLE stacks_by_id
 );
 
 -- Create devices_by_stackid table
-CREATE TABLE devices_by_stackid
+CREATE TABLE IF NOT EXISTS devices_by_stackid
 (
     stackid  UUID,
     id       UUID,
@@ -19,7 +19,7 @@ CREATE TABLE devices_by_stackid
 );
 
 -- Create metrics_by_deviceid table
-CREATE TABLE metrics_by_deviceid
+CREATE TABLE IF NOT EXISTS metrics_by_deviceid
 (
     deviceid UUID,
     id       UUID,
@@ -30,7 +30,7 @@ CREATE TABLE metrics_by_deviceid
 );
 
 -- Create satellites_by_stackid table
-CREATE TABLE satellites_by_stackid
+CREATE TABLE IF NOT EXISTS satellites_by_stackid
 (
     stackid UUID,
     id      UUID,
@@ -38,7 +38,7 @@ CREATE TABLE satellites_by_stackid
 );
 
 -- Create satelliteleases_by_satelliteid table
-CREATE TABLE satelliteleases_by_satelliteid
+CREATE TABLE IF NOT EXISTS satelliteleases_by_satelliteid
 (
     satelliteid UUID,
     id          UUID,
@@ -49,7 +49,7 @@ CREATE TABLE satelliteleases_by_satelliteid
 );
 
 -- Create records_by_metricid table
-CREATE TABLE records_by_metricid
+CREATE TABLE IF NOT EXISTS records_by_metricid
 (
     metricid   UUID,
     id         UUID,
