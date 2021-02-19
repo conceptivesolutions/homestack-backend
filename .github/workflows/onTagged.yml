@@ -34,7 +34,7 @@ jobs:
           password: ${{ secrets.nexus_password }}
 
       - name: Maven / Download Dependencies
-        run: mvn -T 1C -B de.qaware.maven:go-offline-maven-plugin:1.2.8:resolve-dependencies
+        run: mvn -Dmaven.artifact.threads=30 -T 1C -B de.qaware.maven:go-offline-maven-plugin:1.2.8:resolve-dependencies
 
       - name: JVM / Compile
         run: mvn -T 1C clean package
