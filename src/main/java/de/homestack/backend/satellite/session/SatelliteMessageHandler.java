@@ -46,18 +46,25 @@ class SatelliteMessageHandler implements MessageHandler.Whole<WebsocketEvent>
     if (pEvent == null)
       return;
 
-    Object userID = session.getUserProperties().get(_SESSIONKEY_USER_ID);
-    Object authorized = session.getUserProperties().get(_SESSIONKEY_AUTHORIZED);
-
-    // Determine, if authorized
-    if (Boolean.TRUE.equals(authorized) && userID != null)
+    try
     {
-      // First handle it authorized - if not handled, try with "unauthorized" events
-      if (!_handleEventAuthorized((String) userID, pEvent))
+      Object userID = session.getUserProperties().get(_SESSIONKEY_USER_ID);
+      Object authorized = session.getUserProperties().get(_SESSIONKEY_AUTHORIZED);
+
+      // Determine, if authorized
+      if (Boolean.TRUE.equals(authorized) && userID != null)
+      {
+        // First handle it authorized - if not handled, try with "unauthorized" events
+        if (!_handleEventAuthorized((String) userID, pEvent))
+          _handleEventUnauthorized(pEvent);
+      }
+      else
         _handleEventUnauthorized(pEvent);
     }
-    else
-      _handleEventUnauthorized(pEvent);
+    catch (Exception e)
+    {
+      Logger.getLogger(getClass()).error("Failed to process message from satellite", e);
+    }
   }
 
   /**
