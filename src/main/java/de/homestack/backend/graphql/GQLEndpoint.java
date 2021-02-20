@@ -40,6 +40,9 @@ public class GQLEndpoint
   protected IMetricDBRepository metricRepository;
 
   @Inject
+  protected IMetricRecordDBRepository metricRecordRepository;
+
+  @Inject
   protected ISatelliteDBRepository satelliteRepository;
 
   @Inject
@@ -86,6 +89,21 @@ public class GQLEndpoint
   public List<GQLMetric> getMetrics(@NonNull @Source @Name("device") GQLDevice pDevice)
   {
     return metricRepository.getMetricsByDeviceID(_getUserID(), pDevice.id).stream()
+        .map(typeFactory::fromModel)
+        .collect(Collectors.toList());
+  }
+
+  /**
+   * Returns all records of a single metric
+   *
+   * @param pMetric Metric to search records for
+   * @return the list of records
+   */
+  @Query
+  @NonNull
+  public List<GQLMetricRecord> getRecords(@NotNull @Source @Name("metric") GQLMetric pMetric)
+  {
+    return metricRecordRepository.getRecordsByMetricID(_getUserID(), pMetric.id).stream()
         .map(typeFactory::fromModel)
         .collect(Collectors.toList());
   }
