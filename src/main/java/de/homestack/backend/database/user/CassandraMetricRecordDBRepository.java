@@ -28,8 +28,8 @@ class CassandraMetricRecordDBRepository extends AbstractCassandraDBFacade implem
         .map(pRow -> MetricRecordDataModel.builder()
             .id(String.valueOf(pRow.getUuid(0)))
             .metricID(String.valueOf(pRow.getUuid(1)))
-            .recordDate(new Date(Objects.requireNonNull(pRow.getInstant(2)).toEpochMilli()))
-            .state(EMetricRecordState.valueOf(pRow.getString(3)))
+            .recordDate(pRow.getInstant(2) == null ? null : new Date(Objects.requireNonNull(pRow.getInstant(2)).toEpochMilli()))
+            .state(pRow.getString(3) == null ? null : EMetricRecordState.valueOf(pRow.getString(3)))
             .result(pRow.getMap(4, String.class, String.class))
             .build())
         .collect(Collectors.toList());
@@ -42,8 +42,8 @@ class CassandraMetricRecordDBRepository extends AbstractCassandraDBFacade implem
     execute(QueryBuilder.insertInto(sessionProvider.getKeyspaceName(pUserID), _TABLE_RECORDS_BY_METRICID)
                 .value("id", QueryBuilder.literal(UUID.fromString(pModel.id)))
                 .value("metricid", QueryBuilder.literal(UUID.fromString(pModel.metricID)))
-                .value("recorddate", QueryBuilder.literal(pModel.recordDate.toInstant()))
-                .value("state", QueryBuilder.literal(pModel.state))
+                .value("recorddate", QueryBuilder.literal(pModel.recordDate == null ? null : pModel.recordDate.toInstant()))
+                .value("state", QueryBuilder.literal(pModel.state == null ? null : pModel.state.name()))
                 .value("result", QueryBuilder.literal(pModel.result))
                 .build());
     return pModel;
