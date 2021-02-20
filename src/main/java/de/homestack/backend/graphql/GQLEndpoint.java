@@ -5,6 +5,7 @@ import de.homestack.backend.graphql.types.*;
 import de.homestack.backend.rbac.IRole;
 import io.conceptive.homestack.model.data.StackDataModel;
 import io.conceptive.homestack.model.data.device.DeviceDataModel;
+import io.conceptive.homestack.model.data.metric.MetricDataModel;
 import io.conceptive.homestack.model.data.satellite.SatelliteDataModel;
 import io.quarkus.security.UnauthorizedException;
 import org.eclipse.microprofile.graphql.*;
@@ -39,6 +40,9 @@ public class GQLEndpoint
   protected ISatelliteDBRepository satelliteRepository;
 
   @Inject
+  protected IMetricDBRepository metricRepository;
+
+  @Inject
   protected GraphQLTypeFactory typeFactory;
 
   /**
@@ -64,6 +68,21 @@ public class GQLEndpoint
   public List<GQLDevice> getDevices(@NonNull @Source @Name("stack") GQLStack pStack)
   {
     return deviceRepository.getDevicesByStackID(_getUserID(), pStack.id).stream()
+        .map(typeFactory::fromModel)
+        .collect(Collectors.toList());
+  }
+
+  /**
+   * Returns all metrics of a single device
+   *
+   * @param pDevice Device to search metrics for
+   * @return the list of metrics
+   */
+  @Query
+  @NonNull
+  public List<GQLMetric> getMetrics(@NonNull @Source @Name("device") GQLDevice pDevice)
+  {
+    return metricRepository.getMetricsByDeviceID(_getUserID(), pDevice.id).stream()
         .map(typeFactory::fromModel)
         .collect(Collectors.toList());
   }
@@ -115,6 +134,22 @@ public class GQLEndpoint
   }
 
   /**
+   * Searches for a metric with the given id in the given device
+   *
+   * @param pDeviceID ID of the device to search in
+   * @param pMetricID ID of the metric to search for
+   * @return the metric or null, if not found
+   */
+  @Query
+  public GQLMetric getMetric(@NonNull @Name("deviceID") String pDeviceID, @NonNull @Name("id") String pMetricID)
+  {
+    MetricDataModel model = metricRepository.getMetricByID(_getUserID(), pDeviceID, pMetricID);
+    if (model == null)
+      return null;
+    return typeFactory.fromModel(model);
+  }
+
+  /**
    * Searches for a satellite with the given id in the given stack
    *
    * @param pStackID     ID of the stack to search in
@@ -156,6 +191,19 @@ public class GQLEndpoint
   }
 
   /**
+   * Inserts / Updates the given metric
+   *
+   * @param pDeviceID ID of the device where the metric belongs to
+   * @param pMetric   Metric to update / insert
+   * @return the updated / inserted metric
+   */
+  @Mutation
+  public GQLMetric upsertMetric(@NonNull @Name("deviceID") String pDeviceID, @NonNull @Name("metric") GQLMetric pMetric)
+  {
+    return typeFactory.fromModel(metricRepository.upsertMetric(_getUserID(), typeFactory.toModel(pMetric, pDeviceID)));
+  }
+
+  /**
    * Inserts / Updates the given satellite
    *
    * @param pStackID   ID of the stack where the satellite belongs to
@@ -191,6 +239,19 @@ public class GQLEndpoint
   public boolean deleteDevice(@NonNull @Name("stackID") String pStackID, @NonNull @Name("id") String pDeviceID)
   {
     return deviceRepository.deleteDevice(_getUserID(), pStackID, pDeviceID);
+  }
+
+  /**
+   * Deletes a metric with the given id
+   *
+   * @param pDeviceID ID of the device that the metric belongs to
+   * @param pMetricID ID of the metric to delete
+   * @return true, if it was deleted
+   */
+  @Mutation
+  public boolean deleteMetric(@NonNull @Name("deviceID") String pDeviceID, @NonNull @Name("id") String pMetricID)
+  {
+    return metricRepository.deleteMetric(_getUserID(), pDeviceID, pMetricID);
   }
 
   /**
