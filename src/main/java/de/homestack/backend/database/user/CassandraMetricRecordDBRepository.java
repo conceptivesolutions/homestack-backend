@@ -35,4 +35,18 @@ class CassandraMetricRecordDBRepository extends AbstractCassandraDBFacade implem
         .collect(Collectors.toList());
   }
 
+  @NotNull
+  @Override
+  public MetricRecordDataModel upsertRecord(@NotNull String pUserID, @NotNull MetricRecordDataModel pModel)
+  {
+    execute(QueryBuilder.insertInto(sessionProvider.getKeyspaceName(pUserID), _TABLE_RECORDS_BY_METRICID)
+                .value("id", QueryBuilder.literal(UUID.fromString(pModel.id)))
+                .value("metricid", QueryBuilder.literal(UUID.fromString(pModel.metricID)))
+                .value("recorddate", QueryBuilder.literal(pModel.recordDate.toInstant()))
+                .value("state", QueryBuilder.literal(pModel.state))
+                .value("result", QueryBuilder.literal(pModel.result))
+                .build());
+    return pModel;
+  }
+
 }

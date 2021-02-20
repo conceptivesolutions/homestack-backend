@@ -27,7 +27,8 @@ import static org.cognitor.cassandra.migration.MigrationRepository.VERSION_NAME_
 class CassandraMigrationProvider implements IDBMigrationProvider
 {
 
-  private static final ScriptCollector SCRIPT_COLLECTOR_SYSTEM = new _ScriptCollectorBuilder(ISatelliteLeaseSystemDBRepository.class);
+  private static final ScriptCollector SCRIPT_COLLECTOR_SYSTEM = new _ScriptCollectorBuilder(ISatelliteLeaseSystemDBRepository.class)
+      .register("001_initLeases.cql");
 
   private static final ScriptCollector SCRIPT_COLLECTOR_USER = new _ScriptCollectorBuilder(IDeviceDBRepository.class)
       .register("001_init.cql");

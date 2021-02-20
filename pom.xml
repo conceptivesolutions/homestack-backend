@@ -70,6 +70,12 @@
       <artifactId>quarkus-smallrye-graphql</artifactId>
     </dependency>
 
+    <!-- WebSocket -->
+    <dependency>
+      <groupId>io.quarkus</groupId>
+      <artifactId>quarkus-undertow-websockets</artifactId>
+    </dependency>
+
     <!-- Cassandra -->
     <dependency>
       <groupId>com.datastax.oss.quarkus</groupId>

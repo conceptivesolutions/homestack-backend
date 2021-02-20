@@ -19,6 +19,23 @@ class CassandraMetricDBRepository extends AbstractCassandraDBFacade implements I
 
   @NotNull
   @Override
+  public List<MetricDataModel> getMetrics(@NotNull String pUserID)
+  {
+    return execute(QueryBuilder.selectFrom(sessionProvider.getKeyspaceName(pUserID), _TABLE_METRICS_BY_DEVICEID)
+                       .columns("id", "deviceid", "type", "enabled", "settings")
+                       .build())
+        .map(pRow -> MetricDataModel.builder()
+            .id(String.valueOf(pRow.getUuid(0)))
+            .deviceID(String.valueOf(pRow.getUuid(1)))
+            .type(pRow.getString(2))
+            .enabled(pRow.getBoolean(3))
+            .settings(pRow.getMap(4, String.class, String.class))
+            .build())
+        .collect(Collectors.toList());
+  }
+
+  @NotNull
+  @Override
   public List<MetricDataModel> getMetricsByDeviceID(@NotNull String pUserID, @NotNull String pDeviceID)
   {
     return execute(QueryBuilder.selectFrom(sessionProvider.getKeyspaceName(pUserID), _TABLE_METRICS_BY_DEVICEID)

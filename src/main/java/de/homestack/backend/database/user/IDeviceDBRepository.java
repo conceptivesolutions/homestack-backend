@@ -12,6 +12,15 @@ public interface IDeviceDBRepository
 {
 
   /**
+   * Retrieves all devices
+   *
+   * @param pUserID user to query
+   * @return the devices
+   */
+  @NotNull
+  List<DeviceDataModel> getDevices(@NotNull String pUserID);
+
+  /**
    * Retrieves all devices of a single stack
    *
    * @param pUserID  user to query

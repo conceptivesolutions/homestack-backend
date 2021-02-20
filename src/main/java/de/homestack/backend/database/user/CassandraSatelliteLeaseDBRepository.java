@@ -1,10 +1,12 @@
 package de.homestack.backend.database.user;
 
 import com.datastax.oss.driver.api.querybuilder.QueryBuilder;
+import de.homestack.backend.database.system.ISatelliteLeaseSystemDBRepository;
 import io.conceptive.homestack.model.data.satellite.SatelliteLeaseDataModel;
 import org.jetbrains.annotations.*;
 
 import javax.enterprise.context.ApplicationScoped;
+import javax.inject.Inject;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -16,6 +18,9 @@ class CassandraSatelliteLeaseDBRepository extends AbstractCassandraDBFacade impl
 {
 
   private static final String _TABLE_LEASES_BY_SATELLITEID = "satelliteleases_by_satelliteid";
+
+  @Inject
+  protected ISatelliteLeaseSystemDBRepository systemRepository;
 
   @NotNull
   @Override
@@ -73,6 +78,9 @@ class CassandraSatelliteLeaseDBRepository extends AbstractCassandraDBFacade impl
                 .value("userid", QueryBuilder.literal(UUID.fromString(model.userID)))
                 .value("accesstoken", QueryBuilder.literal(model.token))
                 .build());
+
+    // register lease in system
+    systemRepository.registerLease(pUserID, pSatelliteID, model.id);
 
     return model;
   }

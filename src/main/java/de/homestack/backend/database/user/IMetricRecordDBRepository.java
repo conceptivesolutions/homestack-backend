@@ -21,4 +21,14 @@ public interface IMetricRecordDBRepository
   @NotNull
   List<MetricRecordDataModel> getRecordsByMetricID(@NotNull String pUserID, @NotNull String pMetricID);
 
+  /**
+   * Inserts / Updates the metric record
+   *
+   * @param pUserID user to query
+   * @param pModel  record to update / insert
+   * @return the inserted / updated metric record
+   */
+  @NotNull
+  MetricRecordDataModel upsertRecord(@NotNull String pUserID, @NotNull MetricRecordDataModel pModel);
+
 }

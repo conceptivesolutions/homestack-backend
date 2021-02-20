@@ -12,6 +12,15 @@ public interface IMetricDBRepository
 {
 
   /**
+   * Retrieves all metrics
+   *
+   * @param pUserID user to query
+   * @return the metrics
+   */
+  @NotNull
+  List<MetricDataModel> getMetrics(@NotNull String pUserID);
+
+  /**
    * Retrieves all metrics of a single device
    *
    * @param pUserID   user to query

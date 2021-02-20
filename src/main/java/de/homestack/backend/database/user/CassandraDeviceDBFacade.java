@@ -20,6 +20,17 @@ class CassandraDeviceDBFacade extends AbstractCassandraDBFacade implements IDevi
 
   @NotNull
   @Override
+  public List<DeviceDataModel> getDevices(@NotNull String pUserID)
+  {
+    return execute(QueryBuilder.selectFrom(sessionProvider.getKeyspaceName(pUserID), _TABLE_DEVICES_BY_STACKID)
+                       .columns("id", "stackid", "icon", "address", "location", "slots")
+                       .build())
+        .map(pRow -> _toDevice(String.valueOf(pRow.getUuid(1)), pRow.getUuid(0), pRow.getString(2), pRow.getString(3), pRow.getString(4), pRow.getString(5)))
+        .collect(Collectors.toList());
+  }
+
+  @NotNull
+  @Override
   public List<DeviceDataModel> getDevicesByStackID(@NotNull String pUserID, @NotNull String pStackID)
   {
     return execute(QueryBuilder.selectFrom(sessionProvider.getKeyspaceName(pUserID), _TABLE_DEVICES_BY_STACKID)
