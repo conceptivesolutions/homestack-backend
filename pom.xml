@@ -96,6 +96,12 @@
       <artifactId>quarkus-oidc</artifactId>
     </dependency>
 
+    <!-- Microprofile Metrics -->
+    <dependency>
+      <groupId>io.quarkus</groupId>
+      <artifactId>quarkus-smallrye-metrics</artifactId>
+    </dependency>
+
     <!-- Guava -->
     <dependency>
       <groupId>com.google.guava</groupId>

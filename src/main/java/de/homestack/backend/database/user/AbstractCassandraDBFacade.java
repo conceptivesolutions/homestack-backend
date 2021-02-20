@@ -4,6 +4,7 @@ import com.datastax.oss.driver.api.core.cql.*;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import de.homestack.backend.database.CassandraSessionProvider;
 import lombok.SneakyThrows;
+import org.eclipse.microprofile.metrics.annotation.Timed;
 import org.jetbrains.annotations.*;
 
 import javax.inject.Inject;
@@ -27,6 +28,7 @@ abstract class AbstractCassandraDBFacade
    * @return the stream
    */
   @NotNull
+  @Timed
   protected Stream<Row> execute(@NotNull Statement<?> pStatement)
   {
     return StreamSupport.stream(sessionProvider.get()
