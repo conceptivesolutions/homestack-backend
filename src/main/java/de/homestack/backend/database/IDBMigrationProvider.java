@@ -11,6 +11,12 @@ public interface IDBMigrationProvider
 {
 
   /**
+   * Migrates the system to the latest database version.
+   * If it is already on the latest version, nothing will happen
+   */
+  void migrateSystemToLatest();
+
+  /**
    * Migrates the given user to the latest database version.
    * If the user does not exist, the corresponding tables will be created (if necessary).
    * If the user is already on the latest version, nothing will happen.

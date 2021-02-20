@@ -2,11 +2,12 @@ package de.homestack.backend.database;
 
 import com.datastax.oss.driver.api.core.CqlSession;
 import com.datastax.oss.driver.api.querybuilder.SchemaBuilder;
+import de.homestack.backend.database.system.ISatelliteLeaseSystemDBRepository;
 import de.homestack.backend.database.user.IDeviceDBRepository;
 import org.cognitor.cassandra.migration.*;
 import org.cognitor.cassandra.migration.collector.*;
 import org.eclipse.microprofile.config.inject.ConfigProperty;
-import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.*;
 
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
@@ -26,34 +27,56 @@ import static org.cognitor.cassandra.migration.MigrationRepository.VERSION_NAME_
 class CassandraMigrationProvider implements IDBMigrationProvider
 {
 
-  private static final ScriptCollector SCRIPT_COLLECTOR = new _ScriptCollectorBuilder(IDeviceDBRepository.class)
+  private static final ScriptCollector SCRIPT_COLLECTOR_SYSTEM = new _ScriptCollectorBuilder(ISatelliteLeaseSystemDBRepository.class);
+
+  private static final ScriptCollector SCRIPT_COLLECTOR_USER = new _ScriptCollectorBuilder(IDeviceDBRepository.class)
       .register("001_init.cql");
 
   @ConfigProperty(name = "homestack.cassandra.user.keyspace.replication")
   protected Optional<String> keyspaceReplication;
 
+  @ConfigProperty(name = "homestack.cassandra.system.keyspace.replication")
+  protected Optional<String> systemKeyspaceReplication;
+
   @Inject
   protected CassandraSessionProvider sessionProvider;
 
   @Override
+  public void migrateSystemToLatest()
+  {
+    _migrate(IDBConstants.SYSTEM_KEYSPACE, systemKeyspaceReplication.map(Integer::valueOf).orElse(null), SCRIPT_COLLECTOR_SYSTEM);
+  }
+
+  @Override
   public void migrateUserToLatest(@NotNull String pUserID)
+  {
+    _migrate(sessionProvider.getKeyspaceName(pUserID), keyspaceReplication.map(Integer::valueOf).orElse(null), SCRIPT_COLLECTOR_USER);
+  }
+
+  /**
+   * Migrates the given keyspace to the latest version.
+   * Scripts are collected by the given collector.
+   *
+   * @param pKeyspace         Keyspace
+   * @param pRelicationFactor Factor
+   * @param pCollector        Collector
+   */
+  private void _migrate(@NotNull String pKeyspace, @Nullable Integer pRelicationFactor, @NotNull ScriptCollector pCollector)
   {
     try (CqlSession session = sessionProvider.create())
     {
-      String keyspaceName = sessionProvider.getKeyspaceName(pUserID);
-
       // Create Keyspace
-      session.execute(SchemaBuilder.createKeyspace(keyspaceName)
+      session.execute(SchemaBuilder.createKeyspace(pKeyspace)
                           .ifNotExists()
-                          .withSimpleStrategy(keyspaceReplication.map(Integer::valueOf).orElse(1))
+                          .withSimpleStrategy(pRelicationFactor == null ? 1 : pRelicationFactor)
                           .build());
 
       // Migrate Keyspace to latest
-      new MigrationTask(new Database(session, keyspaceName), new _MigrationRepository(SCRIPT_COLLECTOR)).migrate();
+      new MigrationTask(new Database(session, pKeyspace), new _MigrationRepository(pCollector)).migrate();
     }
     catch (Exception e)
     {
-      throw new RuntimeException("Failed to initialize user space for user " + pUserID, e);
+      throw new RuntimeException("Failed to initialize key space " + pKeyspace, e);
     }
   }
 
