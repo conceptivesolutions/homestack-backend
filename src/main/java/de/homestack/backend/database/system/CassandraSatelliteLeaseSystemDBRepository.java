@@ -32,7 +32,7 @@ class CassandraSatelliteLeaseSystemDBRepository extends AbstractCassandraSystemD
   public Pair<String, String> getUserAndSatelliteIDByLeaseID(@NotNull String pLeaseID)
   {
     return execute(QueryBuilder.selectFrom(IDBConstants.SYSTEM_KEYSPACE, _TABLE_LEASES)
-                       .columns("satelliteid", "userid")
+                       .columns("userid", "satelliteid")
                        .whereColumn("leaseid").isEqualTo(QueryBuilder.literal(UUID.fromString(pLeaseID)))
                        .build())
         .map(pRow -> Pair.of(String.valueOf(pRow.getUuid(0)), String.valueOf(pRow.getUuid(1))))
