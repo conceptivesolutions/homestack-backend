@@ -34,7 +34,7 @@ class CassandraSatelliteLeaseDBRepository extends AbstractCassandraDBFacade impl
             .id(String.valueOf(pRow.getUuid(0)))
             .satelliteID(String.valueOf(pRow.getUuid(1)))
             .userID(String.valueOf(pRow.getUuid(2)))
-            .revokedDate(new Date(Objects.requireNonNull(pRow.getInstant(3)).toEpochMilli()))
+            .revokedDate(pRow.getInstant(3) == null ? null : new Date(Objects.requireNonNull(pRow.getInstant(3)).toEpochMilli()))
             .token(pRow.getString(4))
             .build())
         .collect(Collectors.toList());
@@ -53,7 +53,7 @@ class CassandraSatelliteLeaseDBRepository extends AbstractCassandraDBFacade impl
             .id(String.valueOf(pRow.getUuid(0)))
             .satelliteID(String.valueOf(pRow.getUuid(1)))
             .userID(String.valueOf(pRow.getUuid(2)))
-            .revokedDate(new Date(Objects.requireNonNull(pRow.getInstant(3)).toEpochMilli()))
+            .revokedDate(pRow.getInstant(3) == null ? null : new Date(Objects.requireNonNull(pRow.getInstant(3)).toEpochMilli()))
             .token(pRow.getString(4))
             .build())
         .findFirst()
