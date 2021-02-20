@@ -6,7 +6,7 @@ import de.homestack.backend.rbac.IRole;
 import io.conceptive.homestack.model.data.StackDataModel;
 import io.conceptive.homestack.model.data.device.DeviceDataModel;
 import io.conceptive.homestack.model.data.metric.MetricDataModel;
-import io.conceptive.homestack.model.data.satellite.SatelliteDataModel;
+import io.conceptive.homestack.model.data.satellite.*;
 import io.quarkus.security.UnauthorizedException;
 import org.eclipse.microprofile.graphql.*;
 import org.eclipse.microprofile.jwt.JsonWebToken;
@@ -14,7 +14,7 @@ import org.jetbrains.annotations.NotNull;
 
 import javax.annotation.security.RolesAllowed;
 import javax.inject.Inject;
-import java.util.List;
+import java.util.*;
 import java.util.stream.Collectors;
 
 /**
@@ -37,10 +37,13 @@ public class GQLEndpoint
   protected IDeviceDBRepository deviceRepository;
 
   @Inject
+  protected IMetricDBRepository metricRepository;
+
+  @Inject
   protected ISatelliteDBRepository satelliteRepository;
 
   @Inject
-  protected IMetricDBRepository metricRepository;
+  protected ISatelliteLeaseDBRepository satelliteLeaseRepository;
 
   @Inject
   protected GraphQLTypeFactory typeFactory;
@@ -99,6 +102,22 @@ public class GQLEndpoint
   {
     return satelliteRepository.getSatellitesByStackID(_getUserID(), pStack.id).stream()
         .map(typeFactory::fromModel)
+        .collect(Collectors.toList());
+  }
+
+  /**
+   * Returns all leases of a single satellite
+   *
+   * @param pSatellite Satellite to search leases for
+   * @return the list of leases
+   */
+  @Query
+  @NonNull
+  public List<GQLSatelliteLease> getLeases(@NonNull @Source @Name("satellite") GQLSatellite pSatellite)
+  {
+    return satelliteLeaseRepository.getLeasesBySatelliteID(_getUserID(), pSatellite.id).stream()
+        .map(typeFactory::fromModel)
+        .peek(pLease -> pLease.token = null) // do not expose tokens
         .collect(Collectors.toList());
   }
 
@@ -166,6 +185,23 @@ public class GQLEndpoint
   }
 
   /**
+   * Searches for a lease with the given id in the given satellite
+   *
+   * @param pSatelliteID ID of the satellite to search in
+   * @param pLeaseID     ID of the lease to search for
+   * @return the lease or null, if not found
+   */
+  @Query
+  public GQLSatelliteLease getLease(@NonNull @Name("satelliteID") String pSatelliteID, @NonNull @Name("id") String pLeaseID)
+  {
+    SatelliteLeaseDataModel lease = satelliteLeaseRepository.getLeaseByID(_getUserID(), pLeaseID, pSatelliteID);
+    if (lease == null)
+      return null;
+    lease.token = null; // do not expose tokens
+    return typeFactory.fromModel(lease);
+  }
+
+  /**
    * Inserts / Updates the given stack
    *
    * @param pStack Stack to update / insert
@@ -214,6 +250,35 @@ public class GQLEndpoint
   public GQLSatellite upsertSatellite(@NonNull @Name("stackID") String pStackID, @NonNull @Name("satellite") GQLSatellite pSatellite)
   {
     return typeFactory.fromModel(satelliteRepository.upsertSatellite(_getUserID(), typeFactory.toModel(pSatellite, pStackID)));
+  }
+
+  /**
+   * Creates a new lease
+   *
+   * @param pSatelliteID ID of the satellite where the lease belongs to
+   * @return the created lease, with token
+   */
+  @Mutation
+  public GQLSatelliteLease createLease(@NonNull @Name("satelliteID") String pSatelliteID)
+  {
+    return typeFactory.fromModel(satelliteLeaseRepository.createLease(_getUserID(), pSatelliteID));
+  }
+
+  /**
+   * Revokes a lease with the given id
+   *
+   * @param pSatelliteID ID of the satellite that the lease belongs to
+   * @param pLeaseID     ID of the lease to revoke
+   * @return the mutated lease
+   */
+  @Mutation
+  public GQLSatelliteLease revokeLease(@NonNull @Name("satelliteID") String pSatelliteID, @NonNull @Name("id") String pLeaseID)
+  {
+    SatelliteLeaseDataModel revoked = satelliteLeaseRepository.revokeLease(_getUserID(), pSatelliteID, pLeaseID, new Date());
+    if (revoked == null)
+      return null;
+    revoked.token = null; // do not expose tokens
+    return typeFactory.fromModel(revoked);
   }
 
   /**
