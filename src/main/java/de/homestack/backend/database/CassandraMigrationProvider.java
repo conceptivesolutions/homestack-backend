@@ -2,6 +2,7 @@ package de.homestack.backend.database;
 
 import com.datastax.oss.driver.api.core.CqlSession;
 import com.datastax.oss.driver.api.querybuilder.SchemaBuilder;
+import de.homestack.backend.database.user.IDeviceDBRepository;
 import org.cognitor.cassandra.migration.*;
 import org.cognitor.cassandra.migration.collector.*;
 import org.eclipse.microprofile.config.inject.ConfigProperty;
@@ -25,7 +26,7 @@ import static org.cognitor.cassandra.migration.MigrationRepository.VERSION_NAME_
 class CassandraMigrationProvider implements IDBMigrationProvider
 {
 
-  private static final ScriptCollector SCRIPT_COLLECTOR = new _ScriptCollectorBuilder()
+  private static final ScriptCollector SCRIPT_COLLECTOR = new _ScriptCollectorBuilder(IDeviceDBRepository.class)
       .register("001_init.cql");
 
   @ConfigProperty(name = "homestack.cassandra.user.keyspace.replication")
@@ -62,6 +63,13 @@ class CassandraMigrationProvider implements IDBMigrationProvider
   private static class _ScriptCollectorBuilder implements ScriptCollector
   {
     private final Set<ScriptFile> files = new HashSet<>();
+    private final Class<?> referenceClass;
+
+    public _ScriptCollectorBuilder(@NotNull Class<?> pReferenceClass)
+    {
+
+      referenceClass = pReferenceClass;
+    }
 
     @Override
     public void collect(ScriptFile scriptFile)
@@ -83,11 +91,10 @@ class CassandraMigrationProvider implements IDBMigrationProvider
     @NotNull
     public _ScriptCollectorBuilder register(@NotNull String pName)
     {
-      Class<?> reference = getClass();
-      URL resource = reference.getResource(pName);
+      URL resource = referenceClass.getResource(pName);
       if (resource == null)
-        throw new IllegalArgumentException("Failed to find update script for name " + pName + " at class " + reference.getName());
-      files.add(new ScriptFile(extractScriptVersion(pName), reference.getPackageName().replace(".", "/") + "/" + pName, extractScriptName(pName)));
+        throw new IllegalArgumentException("Failed to find update script for name " + pName + " at class " + referenceClass.getName());
+      files.add(new ScriptFile(extractScriptVersion(pName), referenceClass.getPackageName().replace(".", "/") + "/" + pName, extractScriptName(pName)));
       return this;
     }
 
