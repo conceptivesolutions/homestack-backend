@@ -16,7 +16,7 @@
   <name>HomeStack: Backend</name>
 
   <properties>
-    <quarkus.version>1.11.2.Final</quarkus.version>
+    <quarkus.version>1.11.3.Final</quarkus.version>
     <model.version>2.0.0-SNAPSHOT</model.version>
 
     <!-- Base-Image for native builds -->
