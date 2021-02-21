@@ -43,9 +43,7 @@ jobs:
         run: mvn failsafe:integration-test failsafe:verify
 
       - name: Native / Compile
-        run: mvn -T 1C clean package -Pnative \
-          -Dquarkus.container-image.build=true \
-          -Dquarkus.container-image.additional-tags={{ env.RELEASE_VERSION }}
+        run: mvn -T 1C -Pnative -Dquarkus.container-image.build=true -Dquarkus.container-image.additional-tags=${{ env.RELEASE_VERSION }} clean package
 
       - name: Native / Integration Test
         run: mvn -Pnative test-compile failsafe:integration-test failsafe:verify
@@ -53,4 +51,4 @@ jobs:
       - name: Deploy / Docker
         run: |
           docker push images.conceptive.io/homestack.backend:latest
-          docker push images.conceptive.io/homestack.backend:{{ env.RELEASE_VERSION }}
+          docker push images.conceptive.io/homestack.backend:${{ env.RELEASE_VERSION }}
