@@ -9,5 +9,5 @@
 # Maven
 target/
 
-# MongoDB
-.docker/mongodb/data
+# Docker Data
+.docker/*/data

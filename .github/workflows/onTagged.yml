@@ -7,7 +7,7 @@ on:
 
 jobs:
   build:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-20.04
     steps:
       - name: Setup / Checkout
         uses: actions/checkout@v2
@@ -33,14 +33,17 @@ jobs:
           username: ${{ secrets.nexus_user }}
           password: ${{ secrets.nexus_password }}
 
+      - name: Maven / Download Dependencies
+        run: mvn -Dmaven.artifact.threads=30 -T 1C -B de.qaware.maven:go-offline-maven-plugin:1.2.8:resolve-dependencies
+
       - name: JVM / Compile
-        run: mvn clean package
+        run: mvn -T 1C clean package
 
       - name: JVM / Integration Test
         run: mvn failsafe:integration-test failsafe:verify
 
       - name: Native / Compile
-        run: mvn clean package -Pnative \
+        run: mvn -T 1C clean package -Pnative \
           -Dquarkus.container-image.build=true \
           -Dquarkus.container-image.additional-tags={{ env.RELEASE_VERSION }}
 
@@ -51,4 +54,3 @@ jobs:
         run: |
           docker push images.conceptive.io/homestack.backend:latest
           docker push images.conceptive.io/homestack.backend:{{ env.RELEASE_VERSION }}
-

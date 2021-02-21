@@ -1,0 +1,15 @@
+version: '3.1'
+services:
+  backend:
+    image: images.conceptive.io/homestack.backend:latest
+    container_name: homestack_backend
+    pull_policy: always
+    restart: on-failure
+    ports:
+      - 8080:8080
+    environment:
+      HOMESTACK_CASSANDRA_DATACENTER: datacenter1
+      HOMESTACK_CASSANDRA_HOST: nodered.home.lan
+      HOMESTACK_CASSANDRA_USERNAME: cassandra
+      HOMESTACK_CASSANDRA_PORT: 9042
+      HOMESTACK_CASSANDRA_PASSWORD: cassandra
