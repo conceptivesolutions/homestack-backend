@@ -9,6 +9,6 @@ public interface IDBConstants
   /**
    * Name of the system keyspace
    */
-  String SYSTEM_KEYSPACE = "homestack_system";
+  String SYSTEM_KEYSPACE = "hs_system";
 
 }
