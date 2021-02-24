@@ -81,7 +81,8 @@ public class CassandraSessionProvider
   @NotNull
   public String getKeyspaceName(@NotNull String pUserID)
   {
-    return "homestack_user_" + pUserID.replace("-", "");
+    // specialhandling for auth0, because the ID contains a "|" symbol
+    return "homestack_user_" + pUserID.replace("-", "").replace("|", "");
   }
 
 }
