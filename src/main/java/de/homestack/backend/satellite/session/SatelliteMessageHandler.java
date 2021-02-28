@@ -111,7 +111,7 @@ class SatelliteMessageHandler implements MessageHandler.Whole<WebsocketEvent>
       catch (Exception e)
       {
         _killSession();
-        Logger.getLogger(SatelliteMessageHandler.class).warn("Failed to authenticate satellite with lease (" + leaseID + ", " + version + ")");
+        Logger.getLogger(SatelliteMessageHandler.class).warn("Failed to authenticate satellite with lease (" + leaseID + ", " + version + ")", e);
       }
     }
     else
