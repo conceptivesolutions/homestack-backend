@@ -1,6 +1,8 @@
 package de.homestack.backend.database.user;
 
+import com.datastax.oss.driver.api.core.metadata.schema.ClusteringOrder;
 import com.datastax.oss.driver.api.querybuilder.QueryBuilder;
+import com.datastax.oss.driver.api.querybuilder.select.Select;
 import io.conceptive.homestack.model.data.metric.*;
 import org.jetbrains.annotations.NotNull;
 
@@ -19,12 +21,18 @@ class CassandraMetricRecordDBRepository extends AbstractCassandraDBFacade implem
 
   @NotNull
   @Override
-  public List<MetricRecordDataModel> getRecordsByMetricID(@NotNull String pUserID, @NotNull String pMetricID)
+  public List<MetricRecordDataModel> getRecordsByMetricID(@NotNull String pUserID, @NotNull String pMetricID, @NotNull EFetchType pType)
   {
-    return execute(QueryBuilder.selectFrom(sessionProvider.getKeyspaceName(pUserID), _TABLE_RECORDS_BY_METRICID)
-                       .columns("id", "metricid", "recorddate", "state", "result")
-                       .whereColumn("metricid").isEqualTo(QueryBuilder.literal(UUID.fromString(pMetricID)))
-                       .build())
+    Select select = QueryBuilder.selectFrom(sessionProvider.getKeyspaceName(pUserID), _TABLE_RECORDS_BY_METRICID)
+        .columns("id", "metricid", "recorddate", "state", "result")
+        .whereColumn("metricid").isEqualTo(QueryBuilder.literal(UUID.fromString(pMetricID)));
+
+    // only fetch latest record
+    if (pType == EFetchType.LATEST)
+      select = select.orderBy("recorddate", ClusteringOrder.DESC)
+          .limit(1);
+
+    return execute(select.build())
         .map(pRow -> MetricRecordDataModel.builder()
             .id(String.valueOf(pRow.getUuid(0)))
             .metricID(String.valueOf(pRow.getUuid(1)))

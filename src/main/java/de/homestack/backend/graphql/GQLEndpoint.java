@@ -101,9 +101,9 @@ public class GQLEndpoint
    */
   @Query
   @NonNull
-  public List<GQLMetricRecord> getRecords(@NotNull @Source @Name("metric") GQLMetric pMetric)
+  public List<GQLMetricRecord> getRecords(@NotNull @Source @Name("metric") GQLMetric pMetric, @NonNull @Name("type") GQLRecordFetchType pFetchType)
   {
-    return metricRecordRepository.getRecordsByMetricID(_getUserID(), pMetric.id).stream()
+    return metricRecordRepository.getRecordsByMetricID(_getUserID(), pMetric.id, typeFactory.toModel(pFetchType)).stream()
         .map(typeFactory::fromModel)
         .collect(Collectors.toList());
   }

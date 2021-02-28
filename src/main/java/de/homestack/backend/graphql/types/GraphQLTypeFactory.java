@@ -1,5 +1,6 @@
 package de.homestack.backend.graphql.types;
 
+import de.homestack.backend.database.user.IMetricRecordDBRepository;
 import io.conceptive.homestack.model.data.*;
 import io.conceptive.homestack.model.data.device.*;
 import io.conceptive.homestack.model.data.metric.*;
@@ -164,6 +165,14 @@ public class GraphQLTypeFactory
   public ENetworkSlotState toModel(@NotNull GQLNetworkSlotState pModel)
   {
     return ENetworkSlotState.valueOf(pModel.name());
+  }
+
+  @NotNull
+  public IMetricRecordDBRepository.EFetchType toModel(@NotNull GQLRecordFetchType pType)
+  {
+    if (pType == GQLRecordFetchType.LATEST)
+      return IMetricRecordDBRepository.EFetchType.LATEST;
+    return IMetricRecordDBRepository.EFetchType.ALL;
   }
 
 }

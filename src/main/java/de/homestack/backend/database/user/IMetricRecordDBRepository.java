@@ -14,12 +14,13 @@ public interface IMetricRecordDBRepository
   /**
    * Retrieves all records of a single metric
    *
-   * @param pUserID   user to query
-   * @param pMetricID metric to query
+   * @param pUserID    user to query
+   * @param pMetricID  metric to query
+   * @param pFetchType determines, how much of the records should be fetched
    * @return the records
    */
   @NotNull
-  List<MetricRecordDataModel> getRecordsByMetricID(@NotNull String pUserID, @NotNull String pMetricID);
+  List<MetricRecordDataModel> getRecordsByMetricID(@NotNull String pUserID, @NotNull String pMetricID, @NotNull EFetchType pFetchType);
 
   /**
    * Inserts / Updates the metric record
@@ -30,5 +31,14 @@ public interface IMetricRecordDBRepository
    */
   @NotNull
   MetricRecordDataModel upsertRecord(@NotNull String pUserID, @NotNull MetricRecordDataModel pModel);
+
+  /**
+   * Determines, how much of the records should be fetched
+   */
+  enum EFetchType
+  {
+    ALL,
+    LATEST
+  }
 
 }
