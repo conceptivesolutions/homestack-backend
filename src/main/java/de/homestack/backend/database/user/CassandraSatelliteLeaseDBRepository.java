@@ -3,6 +3,7 @@ package de.homestack.backend.database.user;
 import com.datastax.oss.driver.api.querybuilder.QueryBuilder;
 import de.homestack.backend.database.system.ISatelliteLeaseSystemDBRepository;
 import io.conceptive.homestack.model.data.satellite.SatelliteLeaseDataModel;
+import org.apache.commons.lang3.RandomStringUtils;
 import org.jetbrains.annotations.*;
 
 import javax.enterprise.context.ApplicationScoped;
@@ -68,7 +69,7 @@ class CassandraSatelliteLeaseDBRepository extends AbstractCassandraDBFacade impl
         .id(UUID.randomUUID().toString())
         .userID(pUserID)
         .satelliteID(pSatelliteID)
-        .token("TODO")
+        .token(RandomStringUtils.randomAlphanumeric(256))
         .build();
 
     // insert new lease
