@@ -33,7 +33,7 @@ class CassandraSatelliteLeaseDBRepository extends AbstractCassandraDBFacade impl
         .map(pRow -> SatelliteLeaseDataModel.builder()
             .id(String.valueOf(pRow.getUuid(0)))
             .satelliteID(String.valueOf(pRow.getUuid(1)))
-            .userID(String.valueOf(pRow.getUuid(2)))
+            .userID(pRow.getString(2))
             .revokedDate(pRow.getInstant(3) == null ? null : new Date(Objects.requireNonNull(pRow.getInstant(3)).toEpochMilli()))
             .token(pRow.getString(4))
             .build())
@@ -52,7 +52,7 @@ class CassandraSatelliteLeaseDBRepository extends AbstractCassandraDBFacade impl
         .map(pRow -> SatelliteLeaseDataModel.builder()
             .id(String.valueOf(pRow.getUuid(0)))
             .satelliteID(String.valueOf(pRow.getUuid(1)))
-            .userID(String.valueOf(pRow.getUuid(2)))
+            .userID(pRow.getString(2))
             .revokedDate(pRow.getInstant(3) == null ? null : new Date(Objects.requireNonNull(pRow.getInstant(3)).toEpochMilli()))
             .token(pRow.getString(4))
             .build())
@@ -75,7 +75,7 @@ class CassandraSatelliteLeaseDBRepository extends AbstractCassandraDBFacade impl
     execute(QueryBuilder.insertInto(sessionProvider.getKeyspaceName(pUserID), _TABLE_LEASES_BY_SATELLITEID)
                 .value("id", QueryBuilder.literal(UUID.fromString(model.id)))
                 .value("satelliteid", QueryBuilder.literal(UUID.fromString(model.satelliteID)))
-                .value("userid", QueryBuilder.literal(UUID.fromString(model.userID)))
+                .value("userid", QueryBuilder.literal(model.userID))
                 .value("accesstoken", QueryBuilder.literal(model.token))
                 .build());
 

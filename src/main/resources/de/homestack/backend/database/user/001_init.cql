@@ -42,7 +42,7 @@ CREATE TABLE IF NOT EXISTS satelliteleases_by_satelliteid
 (
     satelliteid UUID,
     id          UUID,
-    userid      UUID,
+    userid      TEXT,
     revokeddate TIMESTAMP,
     accesstoken TEXT,
     PRIMARY KEY ( satelliteid, id )

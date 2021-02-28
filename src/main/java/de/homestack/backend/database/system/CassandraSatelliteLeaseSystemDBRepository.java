@@ -23,7 +23,7 @@ class CassandraSatelliteLeaseSystemDBRepository extends AbstractCassandraSystemD
     execute(QueryBuilder.insertInto(IDBConstants.SYSTEM_KEYSPACE, _TABLE_LEASES)
                 .value("satelliteid", QueryBuilder.literal(UUID.fromString(pSatelliteID)))
                 .value("leaseid", QueryBuilder.literal(UUID.fromString(pLeaseID)))
-                .value("userid", QueryBuilder.literal(UUID.fromString(pUserID)))
+                .value("userid", QueryBuilder.literal(pUserID))
                 .build());
   }
 
@@ -35,7 +35,7 @@ class CassandraSatelliteLeaseSystemDBRepository extends AbstractCassandraSystemD
                        .columns("userid", "satelliteid")
                        .whereColumn("leaseid").isEqualTo(QueryBuilder.literal(UUID.fromString(pLeaseID)))
                        .build())
-        .map(pRow -> Pair.of(String.valueOf(pRow.getUuid(0)), String.valueOf(pRow.getUuid(1))))
+        .map(pRow -> Pair.of(pRow.getString(0), String.valueOf(pRow.getUuid(1))))
         .findFirst()
         .orElse(null);
   }
