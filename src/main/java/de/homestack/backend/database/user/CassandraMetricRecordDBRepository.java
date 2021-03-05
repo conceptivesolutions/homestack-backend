@@ -32,7 +32,7 @@ class CassandraMetricRecordDBRepository extends AbstractCassandraDBFacade implem
       select = select.orderBy("recorddate", ClusteringOrder.DESC)
           .limit(1);
 
-    return execute(select.build())
+    return executeQuery(select.build(), pUserID)
         .map(pRow -> MetricRecordDataModel.builder()
             .id(String.valueOf(pRow.getUuid(0)))
             .metricID(String.valueOf(pRow.getUuid(1)))
@@ -47,13 +47,13 @@ class CassandraMetricRecordDBRepository extends AbstractCassandraDBFacade implem
   @Override
   public MetricRecordDataModel upsertRecord(@NotNull String pUserID, @NotNull MetricRecordDataModel pModel)
   {
-    execute(QueryBuilder.insertInto(sessionProvider.getKeyspaceName(pUserID), _TABLE_RECORDS_BY_METRICID)
-                .value("id", QueryBuilder.literal(UUID.fromString(pModel.id)))
-                .value("metricid", QueryBuilder.literal(UUID.fromString(pModel.metricID)))
-                .value("recorddate", QueryBuilder.literal(pModel.recordDate == null ? null : pModel.recordDate.toInstant()))
-                .value("state", QueryBuilder.literal(pModel.state == null ? null : pModel.state.name()))
-                .value("result", QueryBuilder.literal(pModel.result))
-                .build());
+    executeUpdate(QueryBuilder.insertInto(sessionProvider.getKeyspaceName(pUserID), _TABLE_RECORDS_BY_METRICID)
+                      .value("id", QueryBuilder.literal(UUID.fromString(pModel.id)))
+                      .value("metricid", QueryBuilder.literal(UUID.fromString(pModel.metricID)))
+                      .value("recorddate", QueryBuilder.literal(pModel.recordDate == null ? null : pModel.recordDate.toInstant()))
+                      .value("state", QueryBuilder.literal(pModel.state == null ? null : pModel.state.name()))
+                      .value("result", QueryBuilder.literal(pModel.result))
+                      .build(), pUserID);
     return pModel;
   }
 

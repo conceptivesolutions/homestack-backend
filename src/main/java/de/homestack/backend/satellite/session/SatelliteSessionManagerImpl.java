@@ -1,5 +1,6 @@
 package de.homestack.backend.satellite.session;
 
+import de.homestack.backend.database.change.IRepositoryChangeObserver;
 import de.homestack.backend.database.user.*;
 import de.homestack.backend.satellite.auth.ISatelliteAuthenticator;
 import de.homestack.backend.satellite.config.ISatelliteConfigFactory;
@@ -29,10 +30,13 @@ class SatelliteSessionManagerImpl implements ISatelliteSessionManager
   @Inject
   protected IMetricRecordDBRepository metricRecordRepository;
 
+  @Inject
+  protected IRepositoryChangeObserver repositoryChangeObserver;
+
   @Override
   public void registerSession(@NotNull Session pSession)
   {
-    pSession.addMessageHandler(WebsocketEvent.class, new SatelliteMessageHandler(authenticator, configFactory, metricRecordRepository, pSession));
+    pSession.addMessageHandler(WebsocketEvent.class, new SatelliteMessageHandler(authenticator, configFactory, metricRecordRepository, repositoryChangeObserver, pSession));
   }
 
   @Override

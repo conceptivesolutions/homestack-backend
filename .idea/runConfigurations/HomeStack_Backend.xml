@@ -9,6 +9,9 @@
             <option name="delegateBuildToMaven" value="false" />
             <option name="environmentProperties">
               <map>
+                <entry key="AMQP_HOST" value="nodered.home.lan" />
+                <entry key="AMQP_PASSWORD" value="rabbitmq" />
+                <entry key="AMQP_USERNAME" value="rabbitmq" />
                 <entry key="HOMESTACK_CASSANDRA_DATACENTER" value="datacenter1" />
                 <entry key="HOMESTACK_CASSANDRA_HOST" value="nodered.home.lan" />
               </map>

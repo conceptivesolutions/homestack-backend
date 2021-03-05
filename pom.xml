@@ -108,6 +108,12 @@
       <artifactId>quarkus-smallrye-metrics</artifactId>
     </dependency>
 
+    <!-- Backend Intercommunication -->
+    <dependency>
+      <groupId>io.quarkus</groupId>
+      <artifactId>quarkus-smallrye-reactive-messaging-amqp</artifactId>
+    </dependency>
+
     <!-- Guava -->
     <dependency>
       <groupId>com.google.guava</groupId>

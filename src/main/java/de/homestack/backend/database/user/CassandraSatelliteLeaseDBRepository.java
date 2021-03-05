@@ -27,10 +27,10 @@ class CassandraSatelliteLeaseDBRepository extends AbstractCassandraDBFacade impl
   @Override
   public List<SatelliteLeaseDataModel> getLeasesBySatelliteID(@NotNull String pUserID, @NotNull String pSatelliteID)
   {
-    return execute(QueryBuilder.selectFrom(sessionProvider.getKeyspaceName(pUserID), _TABLE_LEASES_BY_SATELLITEID)
-                       .columns("id", "satelliteid", "userid", "revokeddate", "accesstoken")
-                       .whereColumn("satelliteid").isEqualTo(QueryBuilder.literal(UUID.fromString(pSatelliteID)))
-                       .build())
+    return executeQuery(QueryBuilder.selectFrom(sessionProvider.getKeyspaceName(pUserID), _TABLE_LEASES_BY_SATELLITEID)
+                            .columns("id", "satelliteid", "userid", "revokeddate", "accesstoken")
+                            .whereColumn("satelliteid").isEqualTo(QueryBuilder.literal(UUID.fromString(pSatelliteID)))
+                            .build(), pUserID)
         .map(pRow -> SatelliteLeaseDataModel.builder()
             .id(String.valueOf(pRow.getUuid(0)))
             .satelliteID(String.valueOf(pRow.getUuid(1)))
@@ -45,11 +45,11 @@ class CassandraSatelliteLeaseDBRepository extends AbstractCassandraDBFacade impl
   @Override
   public SatelliteLeaseDataModel getLeaseByID(@NotNull String pUserID, @NotNull String pSatelliteID, @NotNull String pLeaseID)
   {
-    return execute(QueryBuilder.selectFrom(sessionProvider.getKeyspaceName(pUserID), _TABLE_LEASES_BY_SATELLITEID)
-                       .columns("id", "satelliteid", "userid", "revokeddate", "accesstoken")
-                       .whereColumn("satelliteid").isEqualTo(QueryBuilder.literal(UUID.fromString(pSatelliteID)))
-                       .whereColumn("id").isEqualTo(QueryBuilder.literal(UUID.fromString(pLeaseID)))
-                       .build())
+    return executeQuery(QueryBuilder.selectFrom(sessionProvider.getKeyspaceName(pUserID), _TABLE_LEASES_BY_SATELLITEID)
+                            .columns("id", "satelliteid", "userid", "revokeddate", "accesstoken")
+                            .whereColumn("satelliteid").isEqualTo(QueryBuilder.literal(UUID.fromString(pSatelliteID)))
+                            .whereColumn("id").isEqualTo(QueryBuilder.literal(UUID.fromString(pLeaseID)))
+                            .build(), pUserID)
         .map(pRow -> SatelliteLeaseDataModel.builder()
             .id(String.valueOf(pRow.getUuid(0)))
             .satelliteID(String.valueOf(pRow.getUuid(1)))
@@ -73,12 +73,12 @@ class CassandraSatelliteLeaseDBRepository extends AbstractCassandraDBFacade impl
         .build();
 
     // insert new lease
-    execute(QueryBuilder.insertInto(sessionProvider.getKeyspaceName(pUserID), _TABLE_LEASES_BY_SATELLITEID)
-                .value("id", QueryBuilder.literal(UUID.fromString(model.id)))
-                .value("satelliteid", QueryBuilder.literal(UUID.fromString(model.satelliteID)))
-                .value("userid", QueryBuilder.literal(model.userID))
-                .value("accesstoken", QueryBuilder.literal(model.token))
-                .build());
+    executeUpdate(QueryBuilder.insertInto(sessionProvider.getKeyspaceName(pUserID), _TABLE_LEASES_BY_SATELLITEID)
+                      .value("id", QueryBuilder.literal(UUID.fromString(model.id)))
+                      .value("satelliteid", QueryBuilder.literal(UUID.fromString(model.satelliteID)))
+                      .value("userid", QueryBuilder.literal(model.userID))
+                      .value("accesstoken", QueryBuilder.literal(model.token))
+                      .build(), pUserID);
 
     // register lease in system
     systemRepository.registerLease(pUserID, pSatelliteID, model.id);
@@ -90,11 +90,11 @@ class CassandraSatelliteLeaseDBRepository extends AbstractCassandraDBFacade impl
   @Override
   public SatelliteLeaseDataModel revokeLease(@NotNull String pUserID, @NotNull String pSatelliteID, @NotNull String pLeaseID, @NotNull Date pRevokeDate)
   {
-    execute(QueryBuilder.update(sessionProvider.getKeyspaceName(pUserID), _TABLE_LEASES_BY_SATELLITEID)
-                .setColumn("revokeddate", QueryBuilder.literal(pRevokeDate.toInstant()))
-                .whereColumn("satelliteid").isEqualTo(QueryBuilder.literal(UUID.fromString(pSatelliteID)))
-                .whereColumn("id").isEqualTo(QueryBuilder.literal(UUID.fromString(pLeaseID)))
-                .build());
+    executeUpdate(QueryBuilder.update(sessionProvider.getKeyspaceName(pUserID), _TABLE_LEASES_BY_SATELLITEID)
+                      .setColumn("revokeddate", QueryBuilder.literal(pRevokeDate.toInstant()))
+                      .whereColumn("satelliteid").isEqualTo(QueryBuilder.literal(UUID.fromString(pSatelliteID)))
+                      .whereColumn("id").isEqualTo(QueryBuilder.literal(UUID.fromString(pLeaseID)))
+                      .build(), pUserID);
     return getLeaseByID(pUserID, pSatelliteID, pLeaseID);
   }
 

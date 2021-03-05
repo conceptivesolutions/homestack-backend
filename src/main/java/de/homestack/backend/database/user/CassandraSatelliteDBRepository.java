@@ -21,10 +21,10 @@ class CassandraSatelliteDBRepository extends AbstractCassandraDBFacade implement
   @Override
   public List<SatelliteDataModel> getSatellitesByStackID(@NotNull String pUserID, @NotNull String pStackID)
   {
-    return execute(QueryBuilder.selectFrom(sessionProvider.getKeyspaceName(pUserID), _TABLE_SATELLITES_BY_STACKID)
-                       .columns("id", "stackid")
-                       .whereColumn("stackid").isEqualTo(QueryBuilder.literal(UUID.fromString(pStackID)))
-                       .build())
+    return executeQuery(QueryBuilder.selectFrom(sessionProvider.getKeyspaceName(pUserID), _TABLE_SATELLITES_BY_STACKID)
+                            .columns("id", "stackid")
+                            .whereColumn("stackid").isEqualTo(QueryBuilder.literal(UUID.fromString(pStackID)))
+                            .build(), pUserID)
         .map(pRow -> SatelliteDataModel.builder()
             .id(String.valueOf(pRow.getUuid(0)))
             .stackID(String.valueOf(pRow.getUuid(1)))
@@ -36,11 +36,11 @@ class CassandraSatelliteDBRepository extends AbstractCassandraDBFacade implement
   @Override
   public SatelliteDataModel getSatelliteByID(@NotNull String pUserID, @NotNull String pStackID, @NotNull String pSatelliteID)
   {
-    return execute(QueryBuilder.selectFrom(sessionProvider.getKeyspaceName(pUserID), _TABLE_SATELLITES_BY_STACKID)
-                       .columns("id", "stackid")
-                       .whereColumn("stackid").isEqualTo(QueryBuilder.literal(UUID.fromString(pStackID)))
-                       .whereColumn("id").isEqualTo(QueryBuilder.literal(UUID.fromString(pSatelliteID)))
-                       .build())
+    return executeQuery(QueryBuilder.selectFrom(sessionProvider.getKeyspaceName(pUserID), _TABLE_SATELLITES_BY_STACKID)
+                            .columns("id", "stackid")
+                            .whereColumn("stackid").isEqualTo(QueryBuilder.literal(UUID.fromString(pStackID)))
+                            .whereColumn("id").isEqualTo(QueryBuilder.literal(UUID.fromString(pSatelliteID)))
+                            .build(), pUserID)
         .map(pRow -> SatelliteDataModel.builder()
             .id(String.valueOf(pRow.getUuid(0)))
             .stackID(String.valueOf(pRow.getUuid(1)))
@@ -53,24 +53,20 @@ class CassandraSatelliteDBRepository extends AbstractCassandraDBFacade implement
   @Override
   public SatelliteDataModel upsertSatellite(@NotNull String pUserID, @NotNull SatelliteDataModel pModel)
   {
-    execute(QueryBuilder.insertInto(sessionProvider.getKeyspaceName(pUserID), _TABLE_SATELLITES_BY_STACKID)
-                .value("id", QueryBuilder.literal(UUID.fromString(pModel.id)))
-                .value("stackid", QueryBuilder.literal(UUID.fromString(pModel.stackID)))
-                .build());
+    executeUpdate(QueryBuilder.insertInto(sessionProvider.getKeyspaceName(pUserID), _TABLE_SATELLITES_BY_STACKID)
+                      .value("id", QueryBuilder.literal(UUID.fromString(pModel.id)))
+                      .value("stackid", QueryBuilder.literal(UUID.fromString(pModel.stackID)))
+                      .build(), pUserID);
     return pModel;
   }
 
   @Override
   public boolean deleteSatellite(@NotNull String pUserID, @NotNull String pStackID, @NotNull String pSatelliteID)
   {
-    return sessionProvider.get()
-        .execute(QueryBuilder.deleteFrom(sessionProvider.getKeyspaceName(pUserID), _TABLE_SATELLITES_BY_STACKID)
-                     .whereColumn("stackid").isEqualTo(QueryBuilder.literal(UUID.fromString(pStackID)))
-                     .whereColumn("id").isEqualTo(QueryBuilder.literal(UUID.fromString(pSatelliteID)))
-                     .build())
-
-        // wasApplied() returns true if the query was applied, and not if the satellite was really deleted.
-        .wasApplied();
+    return executeUpdate(QueryBuilder.deleteFrom(sessionProvider.getKeyspaceName(pUserID), _TABLE_SATELLITES_BY_STACKID)
+                             .whereColumn("stackid").isEqualTo(QueryBuilder.literal(UUID.fromString(pStackID)))
+                             .whereColumn("id").isEqualTo(QueryBuilder.literal(UUID.fromString(pSatelliteID)))
+                             .build(), pUserID);
   }
 
 }

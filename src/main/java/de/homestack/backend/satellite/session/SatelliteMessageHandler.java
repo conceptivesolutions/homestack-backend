@@ -1,5 +1,6 @@
 package de.homestack.backend.satellite.session;
 
+import de.homestack.backend.database.change.IRepositoryChangeObserver;
 import de.homestack.backend.database.user.IMetricRecordDBRepository;
 import de.homestack.backend.satellite.auth.ISatelliteAuthenticator;
 import de.homestack.backend.satellite.config.ISatelliteConfigFactory;
@@ -8,6 +9,7 @@ import io.conceptive.homestack.model.data.satellite.SatelliteLeaseDataModel;
 import io.conceptive.homestack.model.satellite.events.SatelliteWebSocketEvents;
 import io.conceptive.homestack.model.satellite.events.data.AuthenticateEventData;
 import io.conceptive.homestack.model.websocket.WebsocketEvent;
+import io.reactivex.disposables.Disposable;
 import org.jboss.logging.Logger;
 import org.jetbrains.annotations.*;
 
@@ -29,14 +31,18 @@ class SatelliteMessageHandler implements MessageHandler.Whole<WebsocketEvent>
   private final ISatelliteAuthenticator authenticator;
   private final ISatelliteConfigFactory configFactory;
   private final IMetricRecordDBRepository metricRecordRepository;
+  private final IRepositoryChangeObserver repositoryChangeObserver;
   private final Session session;
+  private Disposable changeDisposable;
 
-  public SatelliteMessageHandler(@NotNull ISatelliteAuthenticator pAuthenticator, @NotNull ISatelliteConfigFactory pConfigFactory, @NotNull IMetricRecordDBRepository pMetricRecordRepository,
+  public SatelliteMessageHandler(@NotNull ISatelliteAuthenticator pAuthenticator, @NotNull ISatelliteConfigFactory pConfigFactory,
+                                 @NotNull IMetricRecordDBRepository pMetricRecordRepository, @NotNull IRepositoryChangeObserver pRepositoryChangeObserver,
                                  @NotNull Session pSession)
   {
     authenticator = pAuthenticator;
     configFactory = pConfigFactory;
     metricRecordRepository = pMetricRecordRepository;
+    repositoryChangeObserver = pRepositoryChangeObserver;
     session = pSession;
   }
 
@@ -72,6 +78,8 @@ class SatelliteMessageHandler implements MessageHandler.Whole<WebsocketEvent>
    */
   public void dispose()
   {
+    if (changeDisposable != null && !changeDisposable.isDisposed())
+      changeDisposable.dispose();
   }
 
   /**
@@ -107,6 +115,13 @@ class SatelliteMessageHandler implements MessageHandler.Whole<WebsocketEvent>
 
         // answer with (initial) config
         session.getAsyncRemote().sendObject(SatelliteWebSocketEvents.CONFIG.payload(configFactory.create(lease.userID)));
+
+        // watch all changes to notify the satellite if something changes
+        if (changeDisposable == null || changeDisposable.isDisposed())
+          changeDisposable = repositoryChangeObserver.observeChangesForUser(lease.userID)
+              .map(pL -> configFactory.create(lease.userID))
+              .distinctUntilChanged()
+              .subscribe(pConfig -> session.getAsyncRemote().sendObject(SatelliteWebSocketEvents.CONFIG.payload(pConfig)));
       }
       catch (Exception e)
       {

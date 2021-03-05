@@ -3,6 +3,7 @@ package de.homestack.backend.database.user;
 import com.datastax.oss.driver.api.core.cql.*;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import de.homestack.backend.database.CassandraSessionProvider;
+import de.homestack.backend.database.change.IRepositoryChangeObserver;
 import lombok.SneakyThrows;
 import org.eclipse.microprofile.metrics.annotation.Timed;
 import org.jetbrains.annotations.*;
@@ -21,6 +22,9 @@ abstract class AbstractCassandraDBFacade
   @Inject
   protected CassandraSessionProvider sessionProvider;
 
+  @Inject
+  protected IRepositoryChangeObserver changeObserver;
+
   /**
    * Executes the given statement and returns an appropriate stream
    *
@@ -28,12 +32,30 @@ abstract class AbstractCassandraDBFacade
    * @return the stream
    */
   @NotNull
-  @Timed
-  protected Stream<Row> execute(@NotNull Statement<?> pStatement)
+  @Timed //todo
+  protected Stream<Row> executeQuery(@NotNull Statement<?> pStatement, @Nullable String pUserID)
   {
     return StreamSupport.stream(sessionProvider.get()
                                     .execute(pStatement)
                                     .spliterator(), false);
+  }
+
+  /**
+   * Executes the given statement and returns, if the statement was applied
+   *
+   * @param pStatement statement to execute
+   * @return true, if it was applied
+   */
+  @Timed //todo
+  protected boolean executeUpdate(@NotNull Statement<?> pStatement, @Nullable String pUserID)
+  {
+    boolean wasApplied = sessionProvider.get()
+        .execute(pStatement)
+        .wasApplied();
+
+    if (pUserID != null && wasApplied)
+      changeObserver.fireChangeForUser(pUserID);
+    return wasApplied;
   }
 
   /**
