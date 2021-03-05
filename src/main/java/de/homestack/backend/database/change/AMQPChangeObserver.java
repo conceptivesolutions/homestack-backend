@@ -2,6 +2,7 @@ package de.homestack.backend.database.change;
 
 import io.reactivex.Observable;
 import io.reactivex.subjects.PublishSubject;
+import org.eclipse.microprofile.metrics.annotation.Metered;
 import org.eclipse.microprofile.reactive.messaging.*;
 import org.jetbrains.annotations.NotNull;
 
@@ -34,6 +35,7 @@ class AMQPChangeObserver implements IRepositoryChangeObserver
   }
 
   @Override
+  @Metered(name = "firedUserChanges", description = "meters how much changes a backend propagates to amqp server", absolute = true)
   public void fireChangeForUser(@NotNull String pUserID)
   {
     changeEmitter.send(pUserID);

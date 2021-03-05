@@ -24,12 +24,26 @@ abstract class AbstractCassandraSystemDBFacade
    * @return the stream
    */
   @NotNull
-  @Timed
-  protected Stream<Row> execute(@NotNull Statement<?> pStatement)
+  @Timed(name = "db_systemQueries", description = "contains all executed database queries of the system", absolute = true)
+  protected Stream<Row> executeQuery(@NotNull Statement<?> pStatement)
   {
     return StreamSupport.stream(sessionProvider.get()
                                     .execute(pStatement)
                                     .spliterator(), false);
+  }
+
+  /**
+   * Executes the given update statement and returns true if something changed
+   *
+   * @param pStatement statement to execute
+   * @return true, if something changed
+   */
+  @Timed(name = "db_systemUpdates", description = "contains all executed database updates of the system", absolute = true)
+  protected boolean executeUpdate(@NotNull Statement<?> pStatement)
+  {
+    return sessionProvider.get()
+        .execute(pStatement)
+        .wasApplied();
   }
 
 }

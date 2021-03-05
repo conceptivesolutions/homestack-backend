@@ -10,9 +10,11 @@ import io.conceptive.homestack.model.satellite.events.SatelliteWebSocketEvents;
 import io.conceptive.homestack.model.satellite.events.data.AuthenticateEventData;
 import io.conceptive.homestack.model.websocket.WebsocketEvent;
 import io.reactivex.disposables.Disposable;
+import org.eclipse.microprofile.metrics.annotation.Metered;
 import org.jboss.logging.Logger;
 import org.jetbrains.annotations.*;
 
+import javax.inject.Inject;
 import javax.websocket.*;
 import java.util.Set;
 
@@ -28,22 +30,45 @@ class SatelliteMessageHandler implements MessageHandler.Whole<WebsocketEvent>
   private static final String _SESSIONKEY_USER_ID = "userId";
   private static final String _SESSIONKEY_SATELLITE_ID = "id";
   private static final String _SESSIONKEY_SATELLITE_VERSION = "version";
-  private final ISatelliteAuthenticator authenticator;
-  private final ISatelliteConfigFactory configFactory;
-  private final IMetricRecordDBRepository metricRecordRepository;
-  private final IRepositoryChangeObserver repositoryChangeObserver;
-  private final Session session;
+
+  @Inject
+  protected ISatelliteAuthenticator authenticator;
+
+  @Inject
+  protected ISatelliteConfigFactory configFactory;
+
+  @Inject
+  protected IMetricRecordDBRepository metricRecordRepository;
+
+  @Inject
+  protected IRepositoryChangeObserver repositoryChangeObserver;
+
+  private Session session;
   private Disposable changeDisposable;
 
-  public SatelliteMessageHandler(@NotNull ISatelliteAuthenticator pAuthenticator, @NotNull ISatelliteConfigFactory pConfigFactory,
-                                 @NotNull IMetricRecordDBRepository pMetricRecordRepository, @NotNull IRepositoryChangeObserver pRepositoryChangeObserver,
-                                 @NotNull Session pSession)
+  /**
+   * Attaches this handler to the givben session
+   *
+   * @param pSession Session to attach to
+   */
+  public void attach(@NotNull Session pSession)
   {
-    authenticator = pAuthenticator;
-    configFactory = pConfigFactory;
-    metricRecordRepository = pMetricRecordRepository;
-    repositoryChangeObserver = pRepositoryChangeObserver;
+    if (session != null)
+      throw new RuntimeException("MessageHandle already bound to session. Re-Attach not supported.");
     session = pSession;
+    session.addMessageHandler(WebsocketEvent.class, this);
+  }
+
+  /**
+   * Disposes all opened stuff
+   */
+  public void dispose()
+  {
+    if (session != null)
+      session.removeMessageHandler(this);
+    session = null;
+    if (changeDisposable != null && !changeDisposable.isDisposed())
+      changeDisposable.dispose();
   }
 
   @Override
@@ -61,11 +86,11 @@ class SatelliteMessageHandler implements MessageHandler.Whole<WebsocketEvent>
       if (Boolean.TRUE.equals(authorized) && userID != null)
       {
         // First handle it authorized - if not handled, try with "unauthorized" events
-        if (!_handleEventAuthorized((String) userID, pEvent))
-          _handleEventUnauthorized(pEvent);
+        if (!handleEventAuthorized((String) userID, pEvent))
+          handleEventUnauthorized(pEvent);
       }
       else
-        _handleEventUnauthorized(pEvent);
+        handleEventUnauthorized(pEvent);
     }
     catch (Exception e)
     {
@@ -74,20 +99,12 @@ class SatelliteMessageHandler implements MessageHandler.Whole<WebsocketEvent>
   }
 
   /**
-   * Disposes all opened stuff
-   */
-  public void dispose()
-  {
-    if (changeDisposable != null && !changeDisposable.isDisposed())
-      changeDisposable.dispose();
-  }
-
-  /**
    * Gets called, if an event happened, but the session is not authenticated yet
    *
    * @param pEvent event that happened
    */
-  private void _handleEventUnauthorized(@NotNull WebsocketEvent<?> pEvent)
+  @Metered(name = "satellite_unauthorizedEvents", description = "meters how much unauthorized events were received", absolute = true)
+  protected void handleEventUnauthorized(@NotNull WebsocketEvent<?> pEvent)
   {
     if (pEvent.equalType(SatelliteWebSocketEvents.AUTHENTICATE))
     {
@@ -114,14 +131,12 @@ class SatelliteMessageHandler implements MessageHandler.Whole<WebsocketEvent>
         session.getUserProperties().put(_SESSIONKEY_SATELLITE_VERSION, version);
 
         // answer with (initial) config
-        session.getAsyncRemote().sendObject(SatelliteWebSocketEvents.CONFIG.payload(configFactory.create(lease.userID)));
+        renewConfig(lease.userID);
 
         // watch all changes to notify the satellite if something changes
         if (changeDisposable == null || changeDisposable.isDisposed())
           changeDisposable = repositoryChangeObserver.observeChangesForUser(lease.userID)
-              .map(pL -> configFactory.create(lease.userID))
-              .distinctUntilChanged()
-              .subscribe(pConfig -> session.getAsyncRemote().sendObject(SatelliteWebSocketEvents.CONFIG.payload(pConfig)));
+              .subscribe(pTimestamp -> renewConfig(lease.userID));
       }
       catch (Exception e)
       {
@@ -140,7 +155,8 @@ class SatelliteMessageHandler implements MessageHandler.Whole<WebsocketEvent>
    * @param pEvent  event that happened
    * @return true, if event was handled
    */
-  private boolean _handleEventAuthorized(@NotNull String pUserID, @NotNull WebsocketEvent<?> pEvent)
+  @Metered(name = "satellite_authorizedEvents", description = "meters how much authorized events were received", absolute = true)
+  protected boolean handleEventAuthorized(@NotNull String pUserID, @NotNull WebsocketEvent<?> pEvent)
   {
     if (pEvent.equalType(SatelliteWebSocketEvents.RECORDS))
     {
@@ -154,6 +170,17 @@ class SatelliteMessageHandler implements MessageHandler.Whole<WebsocketEvent>
       Logger.getLogger(SatelliteMessageHandler.class).warn(pEvent + " was not handled, because no handler was registered for it");
       return false;
     }
+  }
+
+  /**
+   * Renews the satellite configuration
+   *
+   * @param pUserID ID of the current user
+   */
+  @Metered(name = "satellite_configRenewal", description = "meters how much satellite configs renew", absolute = true)
+  protected void renewConfig(@NotNull String pUserID)
+  {
+    session.getAsyncRemote().sendObject(SatelliteWebSocketEvents.CONFIG.payload(configFactory.create(pUserID)));
   }
 
   /**

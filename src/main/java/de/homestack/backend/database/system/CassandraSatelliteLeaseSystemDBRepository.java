@@ -20,21 +20,21 @@ class CassandraSatelliteLeaseSystemDBRepository extends AbstractCassandraSystemD
   @Override
   public void registerLease(@NotNull String pUserID, @NotNull String pSatelliteID, @NotNull String pLeaseID)
   {
-    execute(QueryBuilder.insertInto(IDBConstants.SYSTEM_KEYSPACE, _TABLE_LEASES)
-                .value("satelliteid", QueryBuilder.literal(UUID.fromString(pSatelliteID)))
-                .value("leaseid", QueryBuilder.literal(UUID.fromString(pLeaseID)))
-                .value("userid", QueryBuilder.literal(pUserID))
-                .build());
+    executeUpdate(QueryBuilder.insertInto(IDBConstants.SYSTEM_KEYSPACE, _TABLE_LEASES)
+                      .value("satelliteid", QueryBuilder.literal(UUID.fromString(pSatelliteID)))
+                      .value("leaseid", QueryBuilder.literal(UUID.fromString(pLeaseID)))
+                      .value("userid", QueryBuilder.literal(pUserID))
+                      .build());
   }
 
   @Nullable
   @Override
   public Pair<String, String> getUserAndSatelliteIDByLeaseID(@NotNull String pLeaseID)
   {
-    return execute(QueryBuilder.selectFrom(IDBConstants.SYSTEM_KEYSPACE, _TABLE_LEASES)
-                       .columns("userid", "satelliteid")
-                       .whereColumn("leaseid").isEqualTo(QueryBuilder.literal(UUID.fromString(pLeaseID)))
-                       .build())
+    return executeQuery(QueryBuilder.selectFrom(IDBConstants.SYSTEM_KEYSPACE, _TABLE_LEASES)
+                            .columns("userid", "satelliteid")
+                            .whereColumn("leaseid").isEqualTo(QueryBuilder.literal(UUID.fromString(pLeaseID)))
+                            .build())
         .map(pRow -> Pair.of(pRow.getString(0), String.valueOf(pRow.getUuid(1))))
         .findFirst()
         .orElse(null);

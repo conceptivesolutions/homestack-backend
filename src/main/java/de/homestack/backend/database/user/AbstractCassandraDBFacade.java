@@ -32,7 +32,7 @@ abstract class AbstractCassandraDBFacade
    * @return the stream
    */
   @NotNull
-  @Timed //todo
+  @Timed(name = "db_userQueries", description = "contains all executed database queries of a user", absolute = true)
   protected Stream<Row> executeQuery(@NotNull Statement<?> pStatement, @Nullable String pUserID)
   {
     return StreamSupport.stream(sessionProvider.get()
@@ -46,7 +46,7 @@ abstract class AbstractCassandraDBFacade
    * @param pStatement statement to execute
    * @return true, if it was applied
    */
-  @Timed //todo
+  @Timed(name = "db_userUpdates", description = "contains all executed database updates of a user", absolute = true)
   protected boolean executeUpdate(@NotNull Statement<?> pStatement, @Nullable String pUserID)
   {
     boolean wasApplied = sessionProvider.get()
