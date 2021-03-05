@@ -53,7 +53,7 @@ class CassandraMetricRecordDBRepository extends AbstractCassandraDBFacade implem
                       .value("recorddate", QueryBuilder.literal(pModel.recordDate == null ? null : pModel.recordDate.toInstant()))
                       .value("state", QueryBuilder.literal(pModel.state == null ? null : pModel.state.name()))
                       .value("result", QueryBuilder.literal(pModel.result))
-                      .build(), pUserID);
+                      .build(), null); // do not track - no userid
     return pModel;
   }
 
