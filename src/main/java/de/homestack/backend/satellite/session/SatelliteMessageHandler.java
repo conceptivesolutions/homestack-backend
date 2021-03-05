@@ -145,7 +145,10 @@ class SatelliteMessageHandler implements MessageHandler.Whole<WebsocketEvent>
       }
     }
     else
+    {
       _killSession();
+      Logger.getLogger(SatelliteMessageHandler.class).warn("Session to satellite killed, because event could not be handled correctly (" + pEvent + ")");
+    }
   }
 
   /**
@@ -166,10 +169,7 @@ class SatelliteMessageHandler implements MessageHandler.Whole<WebsocketEvent>
       return true;
     }
     else
-    {
-      Logger.getLogger(SatelliteMessageHandler.class).warn(pEvent + " was not handled, because no handler was registered for it");
       return false;
-    }
   }
 
   /**
