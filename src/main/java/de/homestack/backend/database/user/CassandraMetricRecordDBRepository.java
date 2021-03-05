@@ -4,6 +4,7 @@ import com.datastax.oss.driver.api.core.metadata.schema.ClusteringOrder;
 import com.datastax.oss.driver.api.querybuilder.QueryBuilder;
 import com.datastax.oss.driver.api.querybuilder.select.Select;
 import io.conceptive.homestack.model.data.metric.*;
+import org.eclipse.microprofile.metrics.annotation.Metered;
 import org.jetbrains.annotations.NotNull;
 
 import javax.enterprise.context.ApplicationScoped;
@@ -45,6 +46,7 @@ class CassandraMetricRecordDBRepository extends AbstractCassandraDBFacade implem
 
   @NotNull
   @Override
+  @Metered(name = "db_upsertRecord", description = "meters how much metric records are upserted", absolute = true)
   public MetricRecordDataModel upsertRecord(@NotNull String pUserID, @NotNull MetricRecordDataModel pModel)
   {
     executeUpdate(QueryBuilder.insertInto(sessionProvider.getKeyspaceName(pUserID), _TABLE_RECORDS_BY_METRICID)
