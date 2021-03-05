@@ -1,14 +1,18 @@
 package de.homestack.backend.satellite.session;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import de.homestack.backend.database.change.IRepositoryChangeObserver;
 import de.homestack.backend.database.user.IMetricRecordDBRepository;
 import de.homestack.backend.satellite.auth.ISatelliteAuthenticator;
 import de.homestack.backend.satellite.config.ISatelliteConfigFactory;
+import io.cloudevents.CloudEvent;
+import io.cloudevents.core.CloudEventUtils;
+import io.cloudevents.core.builder.CloudEventBuilder;
+import io.cloudevents.core.data.PojoCloudEventData;
+import io.cloudevents.jackson.PojoCloudEventDataMapper;
 import io.conceptive.homestack.model.data.metric.MetricRecordDataModel;
 import io.conceptive.homestack.model.data.satellite.SatelliteLeaseDataModel;
-import io.conceptive.homestack.model.satellite.events.SatelliteWebSocketEvents;
-import io.conceptive.homestack.model.satellite.events.data.AuthenticateEventData;
-import io.conceptive.homestack.model.websocket.WebsocketEvent;
+import io.conceptive.homestack.model.satellite.events.*;
 import io.reactivex.disposables.Disposable;
 import org.eclipse.microprofile.metrics.annotation.Metered;
 import org.jboss.logging.Logger;
@@ -16,15 +20,15 @@ import org.jetbrains.annotations.*;
 
 import javax.inject.Inject;
 import javax.websocket.*;
-import java.util.Set;
+import java.net.URI;
+import java.util.*;
 
 /**
  * Handles all websocket events
  *
  * @author wlganzer, 13.11.2020
  */
-@SuppressWarnings("rawtypes")
-class SatelliteMessageHandler implements MessageHandler.Whole<WebsocketEvent>
+class SatelliteMessageHandler implements MessageHandler.Whole<CloudEvent>
 {
   private static final String _SESSIONKEY_AUTHORIZED = "authorized";
   private static final String _SESSIONKEY_USER_ID = "userId";
@@ -56,7 +60,7 @@ class SatelliteMessageHandler implements MessageHandler.Whole<WebsocketEvent>
     if (session != null)
       throw new RuntimeException("MessageHandle already bound to session. Re-Attach not supported.");
     session = pSession;
-    session.addMessageHandler(WebsocketEvent.class, this);
+    session.addMessageHandler(CloudEvent.class, this);
   }
 
   /**
@@ -72,7 +76,7 @@ class SatelliteMessageHandler implements MessageHandler.Whole<WebsocketEvent>
   }
 
   @Override
-  public void onMessage(@Nullable WebsocketEvent pEvent)
+  public void onMessage(@Nullable CloudEvent pEvent)
   {
     if (pEvent == null)
       return;
@@ -104,16 +108,22 @@ class SatelliteMessageHandler implements MessageHandler.Whole<WebsocketEvent>
    * @param pEvent event that happened
    */
   @Metered(name = "satellite_unauthorizedEvents", description = "meters how much unauthorized events were received", absolute = true)
-  protected void handleEventUnauthorized(@NotNull WebsocketEvent<?> pEvent)
+  protected void handleEventUnauthorized(@NotNull CloudEvent pEvent)
   {
-    if (pEvent.equalType(SatelliteWebSocketEvents.AUTHENTICATE))
+    if (Objects.equals(pEvent.getType(), AuthenticateEventData.TYPE))
     {
       String leaseID = null;
       String version = null;
 
       try
       {
-        AuthenticateEventData data = SatelliteWebSocketEvents.AUTHENTICATE.payloadOf(pEvent);
+        PojoCloudEventData<AuthenticateEventData> eventData = CloudEventUtils.mapData(pEvent, PojoCloudEventDataMapper.from(new ObjectMapper(), AuthenticateEventData.class));
+
+        // ignore invalid events
+        if (eventData == null)
+          return;
+
+        AuthenticateEventData data = eventData.getValue();
         version = data.version;
 
         // just ignore invalid requests
@@ -159,17 +169,21 @@ class SatelliteMessageHandler implements MessageHandler.Whole<WebsocketEvent>
    * @return true, if event was handled
    */
   @Metered(name = "satellite_authorizedEvents", description = "meters how much authorized events were received", absolute = true)
-  protected boolean handleEventAuthorized(@NotNull String pUserID, @NotNull WebsocketEvent<?> pEvent)
+  protected boolean handleEventAuthorized(@NotNull String pUserID, @NotNull CloudEvent pEvent)
   {
-    if (pEvent.equalType(SatelliteWebSocketEvents.RECORDS))
+    if (Objects.equals(pEvent.getType(), MetricRecordsEventData.TYPE))
     {
-      Set<MetricRecordDataModel> records = SatelliteWebSocketEvents.RECORDS.payloadOf(pEvent).records;
-      if (records != null && !records.isEmpty())
-        records.forEach(pRecord -> metricRecordRepository.upsertRecord(pUserID, pRecord));
-      return true;
+      PojoCloudEventData<MetricRecordsEventData> eventData = CloudEventUtils.mapData(pEvent, PojoCloudEventDataMapper.from(new ObjectMapper(), MetricRecordsEventData.class));
+      if (eventData != null)
+      {
+        Set<MetricRecordDataModel> records = eventData.getValue().records;
+        if (records != null && !records.isEmpty())
+          records.forEach(pRecord -> metricRecordRepository.upsertRecord(pUserID, pRecord));
+        return true;
+      }
     }
-    else
-      return false;
+
+    return false;
   }
 
   /**
@@ -180,7 +194,15 @@ class SatelliteMessageHandler implements MessageHandler.Whole<WebsocketEvent>
   @Metered(name = "satellite_configRenewal", description = "meters how much satellite configs renew", absolute = true)
   protected void renewConfig(@NotNull String pUserID)
   {
-    session.getAsyncRemote().sendObject(SatelliteWebSocketEvents.CONFIG.payload(configFactory.create(pUserID)));
+    session.getAsyncRemote().sendObject(CloudEventBuilder.v1()
+                                            .withId(UUID.randomUUID().toString())
+                                            .withType(RenewConfigurationEventData.TYPE)
+                                            .withSource(URI.create("/cloud/config"))
+                                            .withData(PojoCloudEventData.wrap(RenewConfigurationEventData.builder()
+                                                                                  .config(configFactory.create(pUserID))
+                                                                                  .build(),
+                                                                              pData -> new ObjectMapper().writeValueAsBytes(pData)))
+                                            .build());
   }
 
   /**

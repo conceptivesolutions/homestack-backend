@@ -1,7 +1,7 @@
 package de.homestack.backend.satellite;
 
 import de.homestack.backend.satellite.session.ISatelliteSessionManager;
-import io.conceptive.homestack.model.websocket.WebsocketEventCoder;
+import io.conceptive.homestack.model.coders.CloudEventCoder;
 import org.jetbrains.annotations.*;
 
 import javax.enterprise.context.ApplicationScoped;
@@ -13,7 +13,7 @@ import javax.websocket.server.ServerEndpoint;
  * @author w.glanzer, 20.02.2021
  */
 @ApplicationScoped
-@ServerEndpoint(value = "/satellites", decoders = WebsocketEventCoder.class, encoders = WebsocketEventCoder.class)
+@ServerEndpoint(value = "/satellites", decoders = CloudEventCoder.class, encoders = CloudEventCoder.class)
 public class SatelliteWebSocketEndpoint
 {
 
