@@ -16,7 +16,7 @@
   <name>HomeStack: Backend</name>
 
   <properties>
-    <quarkus.version>1.11.3.Final</quarkus.version>
+    <quarkus.version>1.12.1.Final</quarkus.version>
     <model.version>2.1.0</model.version>
 
     <!-- Base-Image for native builds -->
@@ -206,10 +206,13 @@
         <groupId>io.quarkus</groupId>
         <artifactId>quarkus-maven-plugin</artifactId>
         <version>${quarkus.version}</version>
+        <extensions>true</extensions>
         <executions>
           <execution>
             <goals>
               <goal>build</goal>
+              <goal>generate-code</goal>
+              <goal>generate-code-tests</goal>
             </goals>
           </execution>
         </executions>
