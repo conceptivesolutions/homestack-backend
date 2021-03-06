@@ -21,7 +21,7 @@
 
     <!-- Base-Image for native builds -->
     <quarkus.native.container-build>true</quarkus.native.container-build>
-    <quarkus.native.builder-image>quay.io/quarkus/ubi-quarkus-mandrel:21.0.0.0.Final-java11</quarkus.native.builder-image>
+    <quarkus.native.builder-image>quay.io/quarkus/ubi-quarkus-mandrel:21.0-java11</quarkus.native.builder-image>
 
     <!-- Image Information -->
     <quarkus.container-image.builder>jib</quarkus.container-image.builder>
